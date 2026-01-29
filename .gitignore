@@ -1,0 +1,49 @@
+## Visual Studio
+.vs/
+bin/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.cache
+*.log
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+
+# DotCover is a Code Coverage Tool
+*.dotCover
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## .NET
+*.dll
+*.exe
+*.pdb
+
+## Rider
+.idea/
+
+## OS
+Thumbs.db
+.DS_Store
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+#NUNIT
+*.VisualState.xml
+TestResult.xml
