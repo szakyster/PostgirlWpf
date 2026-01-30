@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Postgirl.Views
+namespace Postgirl.Presentation.Views
 {
     public partial class RequestDocumentView : UserControl
     {

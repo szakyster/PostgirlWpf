@@ -1,4 +1,5 @@
-﻿using Postgirl.Domain.Models;
+﻿using Postgirl.Domain.Http.Body;
+using Postgirl.Domain.Models;
 
 namespace Postgirl.Domain.Http;
 

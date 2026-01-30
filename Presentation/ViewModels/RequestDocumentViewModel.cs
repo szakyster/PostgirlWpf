@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Postgirl.Common;
 using Postgirl.Domain.Http;
+using Postgirl.Domain.Http.Body;
 using Postgirl.Domain.Models;
 using Postgirl.Presentation.ViewModels.Authentication;
 using Postgirl.Services;

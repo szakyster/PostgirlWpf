@@ -1,9 +1,8 @@
-
-using Postgirl.Services;
 using System.Windows;
 using Postgirl.Presentation.ViewModels;
+using Postgirl.Services;
 
-namespace Postgirl
+namespace Postgirl.Presentation.Views
 {
     public partial class MainWindow : Window
     {

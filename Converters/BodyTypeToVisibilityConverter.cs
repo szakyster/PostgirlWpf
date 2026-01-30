@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows;
+using Postgirl.Domain.Http.Body;
 
 namespace Postgirl.Converters;
 

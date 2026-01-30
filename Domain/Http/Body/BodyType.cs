@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Postgirl.Domain.Models;
+namespace Postgirl.Domain.Http.Body;
 
 public enum BodyType
 {
