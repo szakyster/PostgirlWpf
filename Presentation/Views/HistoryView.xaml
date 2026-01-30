@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="Postgirl.Presentation.Views.HistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Border Padding="2"
+	        BorderBrush="#444"
+	        BorderThickness="1">
+
+		<ListBox ItemsSource="{Binding HistoryItems}"
+		         BorderThickness="0">
+
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<Grid Margin="4">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="40"/>
+							<ColumnDefinition Width="178"/>
+							<ColumnDefinition Width="40"/>
+							<ColumnDefinition Width="45"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- METHOD -->
+						<TextBlock Grid.Column="0"
+						           Text="{Binding Method}"
+						           FontWeight="Bold"/>
+
+						<!-- URL -->
+						<TextBlock Grid.Column="1"
+						           Text="{Binding Url}"
+						           TextTrimming="CharacterEllipsis"
+						           TextWrapping="Wrap"
+						           />
+
+						<!-- STATUS -->
+						<TextBlock Grid.Column="2"
+						           Text="{Binding StatusCode}"
+						           HorizontalAlignment="Center"/>
+
+						<!-- DURATION -->
+						<TextBlock Grid.Column="3"
+						           Text="{Binding DurationMs, StringFormat='{}{0} ms'}"
+						           HorizontalAlignment="Right"/>
+					</Grid>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+
+		</ListBox>
+	</Border>
+</UserControl>
