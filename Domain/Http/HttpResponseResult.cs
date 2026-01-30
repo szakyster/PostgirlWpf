@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Postgirl.Domain.Models
+namespace Postgirl.Domain.Http
 {
     public class HttpResponseResult
     {

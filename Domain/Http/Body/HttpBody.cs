@@ -1,7 +1,4 @@
-﻿using Postgirl.Domain.Http.Body;
-using Postgirl.Domain.Models;
-
-namespace Postgirl.Domain.Http;
+﻿namespace Postgirl.Domain.Http.Body;
 
 public abstract class HttpBody
 {

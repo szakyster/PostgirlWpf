@@ -1,7 +1,6 @@
 ﻿<UserControl x:Class="Postgirl.Presentation.Views.RequestDocumentView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Postgirl.Domain.Models"
              xmlns:auth="clr-namespace:Postgirl.Domain.Authentication"
              xmlns:body="clr-namespace:Postgirl.Domain.Http.Body">
 

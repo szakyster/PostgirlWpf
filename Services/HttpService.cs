@@ -1,6 +1,4 @@
-﻿
-using Postgirl.Domain.Models;
-using Postgirl.Presentation.ViewModels;
+﻿using Postgirl.Presentation.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

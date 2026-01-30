@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using Postgirl.Domain.Http.Body;
 
 namespace Postgirl.Domain.Http;
 

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using Postgirl.Domain.Http;
-using Postgirl.Domain.Http.Body;
 
-namespace Postgirl.Domain.Models;
+namespace Postgirl.Domain.Http.Body;
 
 public class FormUrlEncodedBody : HttpBody
 {
