@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel.Design;
 using System.Windows.Input;
 using Postgirl.Common;
 using Postgirl.Domain.Http;

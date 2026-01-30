@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection.PortableExecutable;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using Postgirl.Common;
+using Postgirl.Domain.Authentication;
 using Postgirl.Domain.Http;
 using Postgirl.Domain.Http.Body;
 using Postgirl.Presentation.ViewModels.Authentication;
@@ -32,6 +32,7 @@ public class RequestDocumentViewModel : BaseViewModel
         );
 
         Auth = new RequestAuthViewModel();
+        Auth.PropertyChanged += OnAuthChanged;
     }
 
     public RequestAuthViewModel Auth { get; }
@@ -262,5 +263,33 @@ public class RequestDocumentViewModel : BaseViewModel
         return httpMethod;
     }
 
+    private void OnAuthChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(RequestAuthViewModel.AuthType) ||
+            e.PropertyName == nameof(RequestAuthViewModel.BearerToken))
+        {
+            SyncAuthorizationHeader();
+        }
+    }
+
+    private void SyncAuthorizationHeader()
+    {
+        var existing = RequestHeaders
+            .FirstOrDefault(h =>
+                h.IsSystem &&
+                string.Equals(h.Key, "Authorization", StringComparison.OrdinalIgnoreCase));
+
+        // --- NO AUTH ---
+        if (Auth.AuthType != AuthType.BearerToken || string.IsNullOrWhiteSpace(Auth.BearerToken))
+        {
+                if (existing != null)
+                    RemoveHeader(existing);
+                return;
+        }
+
+        // --- BEARER TOKEN ---
+        var value = $"Bearer {Auth.BearerToken}";
+        AddSystemHeader("Authorization", value);
+    }
 
 }
