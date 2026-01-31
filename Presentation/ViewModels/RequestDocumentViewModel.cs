@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -73,7 +73,7 @@ public class RequestDocumentViewModel : BaseViewModel
         get => _request.Body.ToString();
         set
         {
-            if (_request.Body.ToString() != value) return;
+            if ((_request.Body?.ToString() ?? "") == value) return;
             var body = new TextBody();
             body.Content = value;
             _request.Body = body;
