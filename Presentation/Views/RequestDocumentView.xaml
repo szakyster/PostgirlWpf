@@ -9,6 +9,7 @@
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="2*"/>
       <RowDefinition Height="3*"/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
     <!-- Request line -->
@@ -252,5 +253,31 @@
         </TabItem>
       </TabControl>
     </StackPanel>
+
+    <!-- Status bar -->
+    <Border Grid.Row="3"
+            Background="#F0F0F0"
+            BorderBrush="#D0D0D0"
+            BorderThickness="0,1,0,0"
+            Margin="0,8,0,0"
+            Padding="8,4">
+      <StackPanel Orientation="Horizontal"
+                  VerticalAlignment="Center">
+        <TextBlock Text="{Binding StatusCode}"
+                   Foreground="{Binding StatusColor}"
+                   FontWeight="SemiBold"
+                   FontFamily="Consolas"
+                   MinWidth="36"/>
+        <TextBlock Text="{Binding StatusText}"
+                   Margin="8,0,0,0"
+                   Foreground="#666"
+                   VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding ElapsedMilliseconds, StringFormat='{}{0} ms'}"
+                   Margin="8,0,0,0"
+                   Foreground="#666"
+                   FontFamily="Consolas"
+                   VerticalAlignment="Center"/>
+      </StackPanel>
+    </Border>
   </Grid>
 </UserControl>
