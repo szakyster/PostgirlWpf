@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Postgirl.Common;
+using Postgirl.Domain.History;
 using Postgirl.Domain.Http;
 using Postgirl.Services;
 
@@ -16,7 +18,7 @@ public class MainViewModel : BaseViewModel
     {
         _httpService = httpService;
         _historyService = historyService;
-        HistoryViewModel = new HistoryViewModel(historyService);
+        HistoryViewModel = new HistoryViewModel(historyService, this);
 
         NewTabCommand = new RelayCommand(AddNewDocument);
 
@@ -41,5 +43,19 @@ public class MainViewModel : BaseViewModel
         var doc = new RequestDocumentViewModel(_httpService, _historyService, domainModel);
         Documents.Add(doc);
         ActiveDocument = doc;
+    }
+
+    public void OpenHistoryEntry(RequestHistoryEntry entry)
+    {
+        
+
+        var vm = new RequestDocumentViewModel(
+            _httpService,
+            _historyService,
+            entry.ToHttpRequestModel(), entry.ToHttpResponseModel());
+        
+        Documents.Add(vm);
+        ActiveDocument = vm;
+        
     }
 }

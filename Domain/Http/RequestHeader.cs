@@ -8,11 +8,20 @@ public class RequestHeader(string key, string value, bool isSystem)
     /// <summary>
     /// System header: nem szerkeszthető, mindig aktív
     /// </summary>
-    public bool IsSystem { get; } = isSystem;
+    public bool IsSystem { get; set; } = isSystem;
 
     /// <summary>
     /// User header esetén jelzi, hogy ténylegesen csatoljuk-e
     /// System headernél mindig true
     /// </summary>
     public bool IsEnabled { get; set; } = true;
+
+    public RequestHeader Copy()
+    {
+        var copy = new RequestHeader(Key, Value, IsSystem)
+        {
+            IsEnabled = IsEnabled
+        };
+        return copy;
+    }
 }

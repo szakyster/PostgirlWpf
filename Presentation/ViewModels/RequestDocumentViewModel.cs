@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -21,12 +22,15 @@ public class RequestDocumentViewModel : BaseViewModel
     private readonly HttpService _httpService;
     private readonly HistoryService _historyService;
     private readonly HttpRequestModel _request;
+    private HttpResponseResult? _response;
 
-    public RequestDocumentViewModel(HttpService httpService, HistoryService historyService, HttpRequestModel request)
+
+    public RequestDocumentViewModel(HttpService httpService, HistoryService historyService, HttpRequestModel request, HttpResponseResult response = null)
     {
         _httpService = httpService;
         _historyService = historyService;
         _request = request;
+        _response = response;
         SendCommand = new AsyncRelayCommand(SendAsync);
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
 
@@ -37,6 +41,7 @@ public class RequestDocumentViewModel : BaseViewModel
         Auth = new RequestAuthViewModel();
         Auth.PropertyChanged += OnAuthChanged;
     }
+
 
     public RequestAuthViewModel Auth { get; }
 
@@ -82,9 +87,11 @@ public class RequestDocumentViewModel : BaseViewModel
             _request.Body = body;
         }
     }
-    
 
-    public ObservableCollection<RequestHeaderItemViewModel> RequestHeaders { get; }
+    public ObservableCollection<RequestHeaderItemViewModel> RequestHeaders
+    {
+        get;
+    }
 
     private BodyType _selectedBodyType;
     public BodyType SelectedBodyType
@@ -101,67 +108,65 @@ public class RequestDocumentViewModel : BaseViewModel
         }
     }
 
-
     #region response
     public string ResponseBody
     {
-        get => _responseBody;
-        set => SetProperty(ref _responseBody, value);
-    }
-    private string _responseBody;
-
-    public ObservableCollection<string> ResponseHeaders { get; }
-        = new();
-
-    private int _statusCode;
-    public int StatusCode
-    {
-        get => _statusCode;
-        set => SetProperty(ref _statusCode, value);
+        get => _response?.Body;
+        set
+        {
+            if (_response != null && _response.Body != value)
+            {
+                _response.Body = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
-    private string _statusText = string.Empty;
-    public string StatusText
-    {
-        get => _statusText;
-        set => SetProperty(ref _statusText, value);
-    }
+    public IReadOnlyList<string> ResponseHeaders => _response?.Headers ?? new List<string>();
 
-    private long _elapsedMilliseconds;
+    public int StatusCode => _response?.StatusCode ?? 0;
+
+    public string StatusText => SelectStatusName(_response?.StatusCode);
+
     public long ElapsedMilliseconds
     {
-        get => _elapsedMilliseconds;
-        set => SetProperty(ref _elapsedMilliseconds, value);
+        get => _response?.ElapsedMilliseconds ?? 0;
+        set {
+            if (_response != null && _response.ElapsedMilliseconds != value)
+            {
+                _response.ElapsedMilliseconds = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
-    private long _responseSize;
-
-    public long ResponseSize
-    {
-        get => _responseSize;
-        set => SetProperty(ref _responseSize, value);
-    }
+    public long ResponseSize => _response?.ResponseSize ?? 0;
 
 
-    private Brush _statusColor;
-    public Brush StatusColor
-    {
-        get => _statusColor;
-        set => SetProperty(ref _statusColor, value);
-    }
+
+    public Brush StatusColor => SelectStatusColor(_response?.StatusCode);
+
     #endregion
 
-   
-
-    public Brush StatusColor2 =>
-        StatusCode switch
+    private Brush SelectStatusColor(int? statusCode) =>
+        statusCode switch
         {
             >= 200 and < 300 => Brushes.LightGreen,
             >= 400 and < 500 => Brushes.Orange,
             >= 500 => Brushes.Red,
             _ => Brushes.Gray
-        }
-    ;
+        };
+
+    private string SelectStatusName(int? statusCode) =>
+        statusCode switch
+        {
+            >= 200 and < 300 => "OK",
+            >= 300 and < 400 => "Redirect",
+            >= 400 and < 500 => "Client Error",
+            >= 500 => "Server Error",
+            _ => "Unknown"
+        };
+
 
     public ICommand SendCommand { get; }
     public ICommand AddHeaderCommand { get; }
@@ -177,42 +182,26 @@ public class RequestDocumentViewModel : BaseViewModel
             RemoveHeader(header);
         }
 
-        var result = await _httpService.SendAsync(_request);
+        _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
 
-        ResponseBody = result.Body;
-
-        ResponseHeaders.Clear();
-        foreach (var header in result.Headers)
-        {
-            ResponseHeaders.Add(header);
-        }
-
-        StatusCode = result.StatusCode;
-        StatusText = result.StatusCode switch
-        {
-            >= 200 and < 300 => "OK",
-            >= 300 and < 400 => "Redirect",
-            >= 400 and < 500 => "Client Error",
-            >= 500 => "Server Error",
-            _ => "Unknown"
-        };
-        ElapsedMilliseconds = result.ElapsedMilliseconds;
-        ResponseSize = result.ResponseSize;
-        StatusColor = StatusCode switch
-        {
-            >= 200 and < 300 => Brushes.LightGreen,
-            >= 400 and < 500 => Brushes.Orange,
-            >= 500 => Brushes.Red,
-            _ => Brushes.Gray
-        };
+        _response = await _httpService.SendAsync(_request);
+        OnPropertyChanged(nameof(StatusCode));
+        OnPropertyChanged(nameof(StatusColor));
+        OnPropertyChanged(nameof(StatusText));
+        OnPropertyChanged(nameof(ResponseBody));
+        OnPropertyChanged(nameof(ElapsedMilliseconds));
+        OnPropertyChanged(nameof(ResponseHeaders));
 
         var historyEntry = new RequestHistoryEntry
         {
             Method = _request.Method,
             Url = _request.Url,
-            StatusCode = result.StatusCode,
-            DurationMs = result.ElapsedMilliseconds,
-            AuthToken = Auth?.BearerToken
+            StatusCode = _response.StatusCode,
+            DurationMs = _response.ElapsedMilliseconds,
+            Headers = _request.Headers.Where(h => !string.IsNullOrWhiteSpace(h.Key))
+                .Select(h => h.Copy())
+                .ToList(),
+            ResponseBody = _response.Body
         };
         _historyService.Add(historyEntry);
     }
@@ -240,26 +229,18 @@ public class RequestDocumentViewModel : BaseViewModel
             RequestHeaders.Remove(existing);
 
         var header = new RequestHeader(key, value, isSystem: true);
-        _request.Headers.Add(header);
         RequestHeaders.Add(new RequestHeaderItemViewModel(header, RemoveHeader));
     }
 
     public void AddUserHeader(string key, string value)
     {
         var header = new RequestHeader(key, value, isSystem: false);
-        _request.Headers.Add(header);
         RequestHeaders.Add(new RequestHeaderItemViewModel(header, RemoveHeader));
     }
 
     private void RemoveHeader(RequestHeaderItemViewModel headerVm)
     {
         RequestHeaders.Remove(headerVm);
-        var header = _request.Headers
-            .FirstOrDefault(h => h.Key == headerVm.Key && h.Value == headerVm.Value);
-        if (header != null)
-        {
-            _request.Headers.Remove(header);
-        }
     }
 
     private static HttpMethod GetHttpMethod(string method)

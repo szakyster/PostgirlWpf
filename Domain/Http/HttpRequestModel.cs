@@ -9,6 +9,6 @@ public class HttpRequestModel
     public HttpMethod Method { get; set; } = HttpMethod.Get;
     public string Url { get; set; } = string.Empty;
 
-    public IList<RequestHeader> Headers { get; } =[];
+    public IList<RequestHeader> Headers { get; set; } =[];
     public HttpBody Body { get; set; } = new TextBody();
 }

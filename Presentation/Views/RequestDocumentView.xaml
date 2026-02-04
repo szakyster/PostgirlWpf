@@ -260,7 +260,9 @@
             BorderBrush="#D0D0D0"
             BorderThickness="0,1,0,0"
             Margin="0,8,0,0"
-            Padding="8,4">
+            Padding="8,4"
+            Visibility="{Binding StatusCode, Converter={StaticResource StatusCodeToVisibilityConverter}}"
+            >
       <StackPanel Orientation="Horizontal"
                   VerticalAlignment="Center">
         <TextBlock Text="{Binding StatusCode}"

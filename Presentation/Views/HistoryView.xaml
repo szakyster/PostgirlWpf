@@ -7,6 +7,8 @@
 	        BorderThickness="1">
 
 		<ListBox ItemsSource="{Binding HistoryItems}"
+		         SelectedItem="{Binding SelectedHistoryItem}"
+		         MouseDoubleClick="OnHistoryDoubleClick"
 		         BorderThickness="0">
 
 			<ListBox.ItemTemplate>
