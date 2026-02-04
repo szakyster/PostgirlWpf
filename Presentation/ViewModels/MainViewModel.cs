@@ -1,5 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Postgirl.Common;
 using Postgirl.Domain.History;
@@ -21,6 +21,7 @@ public class MainViewModel : BaseViewModel
         HistoryViewModel = new HistoryViewModel(historyService, this);
 
         NewTabCommand = new RelayCommand(AddNewDocument);
+        CloseDocumentCommand = new RelayCommand<RequestDocumentViewModel>(CloseDocument);
 
         AddNewDocument(); // első fül
     }
@@ -36,6 +37,7 @@ public class MainViewModel : BaseViewModel
     }
 
     public ICommand NewTabCommand { get; }
+    public ICommand CloseDocumentCommand { get; }
 
     private void AddNewDocument()
     {
@@ -56,6 +58,26 @@ public class MainViewModel : BaseViewModel
         
         Documents.Add(vm);
         ActiveDocument = vm;
-        
+    }
+
+    private void CloseDocument(RequestDocumentViewModel doc)
+    {
+        if (doc == null) return;
+
+        var index = Documents.IndexOf(doc);
+        Documents.Remove(doc);
+
+        if (ActiveDocument == doc)
+        {
+            if (Documents.Count == 0)
+            {
+                ActiveDocument = null;
+            }
+            else
+            {
+                var newIndex = Math.Max(0, index - 1);
+                ActiveDocument = Documents[newIndex];
+            }
+        }
     }
 }
