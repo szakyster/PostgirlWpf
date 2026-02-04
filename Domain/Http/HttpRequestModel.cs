@@ -10,5 +10,5 @@ public class HttpRequestModel
     public string Url { get; set; } = string.Empty;
 
     public IList<RequestHeader> Headers { get; } =[];
-    public HttpBody Body { get; set; }
+    public HttpBody Body { get; set; } = new TextBody();
 }

@@ -9,11 +9,14 @@ namespace Postgirl.Presentation.ViewModels;
 public class MainViewModel : BaseViewModel
 {
     private readonly HttpService _httpService;
+    private readonly HistoryService _historyService;
+    public HistoryViewModel HistoryViewModel { get; }
 
-
-    public MainViewModel(HttpService httpService)
+    public MainViewModel(HttpService httpService, HistoryService historyService)
     {
         _httpService = httpService;
+        _historyService = historyService;
+        HistoryViewModel = new HistoryViewModel(historyService);
 
         NewTabCommand = new RelayCommand(AddNewDocument);
 
@@ -35,7 +38,7 @@ public class MainViewModel : BaseViewModel
     private void AddNewDocument()
     {
         var domainModel = new HttpRequestModel();
-        var doc = new RequestDocumentViewModel(_httpService, domainModel);
+        var doc = new RequestDocumentViewModel(_httpService, _historyService, domainModel);
         Documents.Add(doc);
         ActiveDocument = doc;
     }

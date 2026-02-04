@@ -8,7 +8,6 @@ namespace Postgirl.Presentation.Views
         public HistoryView()
         {
             InitializeComponent();
-            DataContext = new HistoryViewModel();
         }
     }
 }

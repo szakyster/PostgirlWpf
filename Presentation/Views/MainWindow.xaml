@@ -56,7 +56,7 @@
 							<Expander Header="History"
 							          IsExpanded="True"
 							          Margin="4">
-								<views:HistoryView />
+								<views:HistoryView DataContext="{Binding HistoryViewModel}"/>
 							</Expander>
 
 						</StackPanel>

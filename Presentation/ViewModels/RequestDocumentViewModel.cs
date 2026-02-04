@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Postgirl.Common;
 using Postgirl.Domain.Authentication;
+using Postgirl.Domain.History;
 using Postgirl.Domain.Http;
 using Postgirl.Domain.Http.Body;
 using Postgirl.Presentation.ViewModels.Authentication;
@@ -18,11 +19,13 @@ namespace Postgirl.Presentation.ViewModels;
 public class RequestDocumentViewModel : BaseViewModel
 {
     private readonly HttpService _httpService;
+    private readonly HistoryService _historyService;
     private readonly HttpRequestModel _request;
 
-    public RequestDocumentViewModel(HttpService httpService, HttpRequestModel request)
+    public RequestDocumentViewModel(HttpService httpService, HistoryService historyService, HttpRequestModel request)
     {
         _httpService = httpService;
+        _historyService = historyService;
         _request = request;
         SendCommand = new AsyncRelayCommand(SendAsync);
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
@@ -202,6 +205,16 @@ public class RequestDocumentViewModel : BaseViewModel
             >= 500 => Brushes.Red,
             _ => Brushes.Gray
         };
+
+        var historyEntry = new RequestHistoryEntry
+        {
+            Method = _request.Method,
+            Url = _request.Url,
+            StatusCode = result.StatusCode,
+            DurationMs = result.ElapsedMilliseconds,
+            AuthToken = Auth?.BearerToken
+        };
+        _historyService.Add(historyEntry);
     }
 
     private void UpdateSystemHeaders()
