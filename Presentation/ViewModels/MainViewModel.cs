@@ -12,24 +12,36 @@ public class MainViewModel : BaseViewModel
 {
     private readonly HttpService _httpService;
     private readonly HistoryService _historyService;
+    private readonly StorageService _storageService;
     public HistoryViewModel HistoryViewModel { get; }
 
-    public MainViewModel(HttpService httpService, HistoryService historyService)
+    public MainViewModel(HttpService httpService, HistoryService historyService, StorageService storageService)
     {
+        _storageService = storageService;
         _httpService = httpService;
         _historyService = historyService;
+
         HistoryViewModel = new HistoryViewModel(historyService, this);
 
         NewTabCommand = new RelayCommand(AddNewDocument);
         CloseDocumentCommand = new RelayCommand<RequestDocumentViewModel>(CloseDocument);
 
+        LoadState();
+
         AddNewDocument(); // első fül
+    }
+
+    private async void LoadState()
+    {
+        var state = await _storageService.LoadAsync();
+        _historyService.Import(state.History);
     }
 
     public ObservableCollection<RequestDocumentViewModel> Documents { get; }
         = new();
 
     private RequestDocumentViewModel _activeDocument;
+
     public RequestDocumentViewModel ActiveDocument
     {
         get => _activeDocument;

@@ -7,8 +7,8 @@
   <Grid Margin="10">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
-      <RowDefinition Height="2*"/>
-      <RowDefinition Height="3*"/>
+      <RowDefinition Height="1*"/>
+      <RowDefinition Height="1*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
@@ -37,10 +37,14 @@
     </Grid>
 
     <!-- Body -->
-    <StackPanel Grid.Row="1" Margin="0,10,0,0">
-	    <Label Content="Request"/>
+	<Grid Grid.Row="1" Margin="0,10,0,0">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Label Grid.Row="0" Content="Request"/>
 
-	    <TabControl>
+		<TabControl Grid.Row="1">
 		    <!-- BODY -->
 		    <TabItem Header="Body">
 			    <Grid Margin="8">
@@ -60,22 +64,78 @@
 					               Margin="0,0,6,0"
 					               FontWeight="SemiBold"/>
 
-							<ComboBox ItemsSource="{Binding Source={x:Static body:BodyTypeHelper.GetValues}}"
-					              SelectedItem="{Binding SelectedBodyType}"
-					              Margin="0,0,0,8"/>
-						</StackPanel>
+						<ComboBox ItemsSource="{Binding Source={x:Static body:BodyTypeHelper.GetValues}}"
+				              SelectedItem="{Binding SelectedBodyType}"
+				              Margin="0,0,0,8"/>
+					</StackPanel>
 
-				    <!-- Body editor -->
-				    <TextBox Grid.Row="1"
-				             Text="{Binding RequestBody}"
+						<!-- BODY EDITORS -->
+					<Grid Grid.Row="1">
+
+						<!-- TEXT BODY -->
+						<TextBox Text="{Binding TextBodyText}"
 				             AcceptsReturn="True"
+				             FontFamily="Consolas"
 				             VerticalScrollBarVisibility="Auto"
-				             HorizontalScrollBarVisibility="Auto"
 				             Visibility="{Binding SelectedBodyType,
-								Converter={StaticResource BodyTypeToVisibilityConverter}}"
-				             FontFamily="Consolas"/>
+				                 Converter={StaticResource BodyTypeToVisibilityConverter},
+				                 ConverterParameter=Text}" />
+
+						<!-- JSON BODY -->
+						<TextBox Text="{Binding JsonBodyText}"
+				             AcceptsReturn="True"
+				             FontFamily="Consolas"
+				             VerticalScrollBarVisibility="Auto"
+				             Visibility="{Binding SelectedBodyType,
+				                 Converter={StaticResource BodyTypeToVisibilityConverter},
+				                 ConverterParameter=Json}" />
+
+						<!-- FORM BODY -->
+						<Grid Visibility="{Binding SelectedBodyType,
+					        Converter={StaticResource BodyTypeToVisibilityConverter},
+					        ConverterParameter=FormUrlEncoded}">
+
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+
+							<DataGrid ItemsSource="{Binding FormItems}"
+				                  AutoGenerateColumns="False"
+				                  CanUserAddRows="False">
+
+								<DataGrid.Columns>
+
+									<DataGridTextColumn Header="Key"
+                            Binding="{Binding Key}"
+                            Width="200"/>
+
+									<DataGridTextColumn Header="Value"
+                            Binding="{Binding Value}"
+                            Width="*"/>
+
+									<DataGridTemplateColumn Width="40">
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate>
+												<Button Content="✖"
+				                                    Command="{Binding RemoveCommand}"
+				                                    Padding="2"/>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+								</DataGrid.Columns>
+							</DataGrid>
+
+							<Button Grid.Row="1"
+				                Content="+ Add field"
+				                Command="{Binding AddFormItemCommand}"
+				                Margin="0,8,0,0"/>
+						</Grid>
+
+					</Grid>
 			    </Grid>
-				</TabItem>
+			</TabItem>
 
 			<!-- Auth -->
 			<TabItem Header="Auth">
@@ -167,21 +227,26 @@
 
 
 <!-- HEADERS -->
-			<TabItem Header="Headers">
+				<TabItem Header="Headers">
 
-				<DockPanel>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
 
-					<!-- ADD HEADER BUTTON -->
-					<Button Content="+ Add Header"
+						<!-- ADD HEADER BUTTON -->
+						<Button Content="+ Add Header"
                 Command="{Binding AddHeaderCommand}"
-                DockPanel.Dock="Top"
                 HorizontalAlignment="Left"
                 Margin="0,0,0,8"/>
 
 						<!-- HEADERS GRID -->
-						<DataGrid ItemsSource="{Binding RequestHeaders}"
+						<DataGrid Grid.Row="1"
+                  ItemsSource="{Binding RequestHeaders}"
                   AutoGenerateColumns="False"
-                  CanUserAddRows="False">
+                  CanUserAddRows="False"
+                  VerticalScrollBarVisibility="Auto">
 
 							<DataGrid.Columns>
 
@@ -227,18 +292,21 @@
 							</DataGrid.Columns>
 						</DataGrid>
 
-					</DockPanel>
+					</Grid>
 
 				</TabItem>
-
 			</TabControl>
 
-    </StackPanel>
+    </Grid>
 
 		<!-- Response -->
-    <StackPanel Grid.Row="2" Margin="0,10,0,0">
-      <Label Content="Response:"/>
-      <TabControl>
+	<Grid Grid.Row="2" Margin="0,10,0,0">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+			<Label Content="Response:"/>
+      <TabControl Grid.Row="1">
         <TabItem Header="Body">
           <TextBox Text="{Binding ResponseBody}"
                    Background="Black"
@@ -252,7 +320,7 @@
                    FontFamily="Consolas"/>
         </TabItem>
       </TabControl>
-    </StackPanel>
+    </Grid>
 
     <!-- Status bar -->
     <Border Grid.Row="3"

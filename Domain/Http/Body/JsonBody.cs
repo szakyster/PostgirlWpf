@@ -3,5 +3,5 @@
 public class JsonBody : HttpBody
 {
     public override BodyType Type => BodyType.Json;
-    public string Content { get; set; }
+    public string Json { get; set; }
 }

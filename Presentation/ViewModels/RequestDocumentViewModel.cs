@@ -33,6 +33,7 @@ public class RequestDocumentViewModel : BaseViewModel
         _response = response;
         SendCommand = new AsyncRelayCommand(SendAsync);
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
+        AddFormItemCommand = new RelayCommand(AddFormItem);
 
         RequestHeaders = new ObservableCollection<RequestHeaderItemViewModel>(
             _request.Headers.Select(h => new RequestHeaderItemViewModel(h, RemoveHeader))
@@ -53,6 +54,16 @@ public class RequestDocumentViewModel : BaseViewModel
         get => _request.Url;
         set
         {
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            // Ha nem http:// vagy https://, egészítsd ki
+            if (!value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                value = "http://" + value;
+            }
+
             if (_request.Url == value) return;
             _request.Url = value;
             OnPropertyChanged();
@@ -76,16 +87,54 @@ public class RequestDocumentViewModel : BaseViewModel
         }
     }
 
-    public string RequestBody
+/*    public string RequestBody
     {
         get => _request.Body.ToString();
         set
         {
             if ((_request.Body?.ToString() ?? "") == value) return;
-            var body = new TextBody();
-            body.Content = value;
+            var body = new TextBody
+            {
+                Content = value
+            };
             _request.Body = body;
         }
+    }
+*/
+    private string _textBodyText = "";
+    public string TextBodyText
+    {
+        get => _textBodyText;
+        set
+        {
+            if (SetProperty(ref _textBodyText, value))
+                SyncBodyToDomain();
+        }
+    }
+
+    private string _jsonBodyText = "";
+    public string JsonBodyText
+    {
+        get => _jsonBodyText;
+        set
+        {
+            if (SetProperty(ref _jsonBodyText, value))
+                SyncBodyToDomain();
+        }
+    }
+
+    public ObservableCollection<FormItemViewModel> FormItems { get; }
+        = new();
+
+    private void RemoveFormItem(FormItemViewModel item)
+    {
+        FormItems.Remove(item);
+    }
+    private void AddFormItem()
+    {
+        var domain = new FormUrlEncodedItem();
+        var vm = new FormItemViewModel(domain, RemoveFormItem);
+        FormItems.Add(vm);
     }
 
     public ObservableCollection<RequestHeaderItemViewModel> RequestHeaders
@@ -102,12 +151,51 @@ public class RequestDocumentViewModel : BaseViewModel
             if (_selectedBodyType != value)
             {
                 _selectedBodyType = value;
-                OnPropertyChanged(nameof(SelectedBodyType));
+                OnPropertyChanged();
                 UpdateSystemHeaders();
+                SyncBodyToDomain();
             }
         }
     }
 
+    private void SyncBodyToDomain()
+    {
+        switch (SelectedBodyType)
+        {
+            case BodyType.Text:
+                _request.Body = new TextBody
+                {
+                    Text = TextBodyText
+                };
+                break;
+
+            case BodyType.Json:
+                _request.Body = new JsonBody
+                {
+                    Json = JsonBodyText
+                };
+                break;
+
+            case BodyType.FormUrlEncoded:
+                var form = new FormUrlEncodedBody();
+
+                foreach (var item in FormItems)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.Key))
+                        form.Items.Add(item.ToDomain());
+                }
+
+                _request.Body = form;
+                break;
+
+            case BodyType.None:
+            case BodyType.Xml:
+            default:
+                _request.Body = null;
+                break;
+        }
+    }
+    
     #region response
     public string ResponseBody
     {
@@ -141,9 +229,7 @@ public class RequestDocumentViewModel : BaseViewModel
     }
 
     public long ResponseSize => _response?.ResponseSize ?? 0;
-
-
-
+    
     public Brush StatusColor => SelectStatusColor(_response?.StatusCode);
 
     #endregion
@@ -170,6 +256,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
     public ICommand SendCommand { get; }
     public ICommand AddHeaderCommand { get; }
+    public ICommand AddFormItemCommand { get; }
 
     private async Task SendAsync()
     {

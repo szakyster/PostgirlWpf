@@ -9,7 +9,7 @@ namespace Postgirl.Presentation.Views
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel(new HttpService(), new HistoryService());
+            //DataContext = new MainViewModel(new HttpService(), new HistoryService(),new StorageService());
         }
     }
 }
