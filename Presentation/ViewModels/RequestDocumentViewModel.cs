@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -57,7 +57,7 @@ public class RequestDocumentViewModel : BaseViewModel
             if (string.IsNullOrWhiteSpace(value))
                 return;
 
-            // Ha nem http:// vagy https://, eg�sz�tsd ki
+            // Ha nem http:// vagy https://, egészítsd ki
             if (!value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
                 !value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             {
@@ -317,12 +317,14 @@ public class RequestDocumentViewModel : BaseViewModel
 
         var header = new RequestHeader(key, value, isSystem: true);
         RequestHeaders.Add(new RequestHeaderItemViewModel(header, RemoveHeader));
+        SortHeaders();
     }
 
     public void AddUserHeader(string key, string value)
     {
         var header = new RequestHeader(key, value, isSystem: false);
         RequestHeaders.Add(new RequestHeaderItemViewModel(header, RemoveHeader));
+        SortHeaders();
     }
 
     private void RemoveHeader(RequestHeaderItemViewModel headerVm)
@@ -373,4 +375,16 @@ public class RequestDocumentViewModel : BaseViewModel
         AddSystemHeader("Authorization", value);
     }
 
+    private void SortHeaders()
+    {
+        var ordered = RequestHeaders
+            .OrderByDescending(h => h.IsSystem) // system előre
+            .ThenBy(h => h.Key, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        RequestHeaders.Clear();
+
+        foreach (var h in ordered)
+            RequestHeaders.Add(h);
+    }
 }
