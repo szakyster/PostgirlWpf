@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Postgirl.Presentation.Views.RequestDocument.Parts.ResponseView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Grid Margin="0,10,0,0">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Label Content="Response:"/>
+		<TabControl Grid.Row="1">
+			<TabItem Header="Body">
+				<TextBox Text="{Binding ResponseBody}"
+				         Background="Black"
+				         Foreground="LightGreen"
+				         FontFamily="Consolas"
+				         AcceptsReturn="True"
+				         IsReadOnly="True"/>
+			</TabItem>
+			<TabItem Header="Headers">
+				<ListBox ItemsSource="{Binding ResponseHeaders}"
+				         FontFamily="Consolas"/>
+			</TabItem>
+		</TabControl>
+	</Grid>
+
+</UserControl>

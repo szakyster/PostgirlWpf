@@ -1,0 +1,95 @@
+﻿<UserControl x:Class="Postgirl.Presentation.Views.RequestDocument.Parts.RequestBodyView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:body="clr-namespace:Postgirl.Domain.Http.Body">
+
+	<Grid Margin="8">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<StackPanel Orientation="Horizontal"
+            Grid.Row="0"
+            Margin="0,0,0,8"
+            VerticalAlignment="Center">
+
+			<TextBlock Text="Body:"
+               VerticalAlignment="Center"
+               Margin="0,0,6,0"
+               FontWeight="SemiBold"/>
+
+			<ComboBox ItemsSource="{Binding Source={x:Static body:BodyTypeHelper.GetValues}}"
+          SelectedItem="{Binding SelectedBodyType}"
+          Margin="0,0,0,8"/>
+		</StackPanel>
+
+		<!-- BODY EDITORS -->
+		<Grid Grid.Row="1">
+
+			<!-- TEXT BODY -->
+			<TextBox Text="{Binding TextBodyText}"
+         AcceptsReturn="True"
+         FontFamily="Consolas"
+         VerticalScrollBarVisibility="Auto"
+         Visibility="{Binding SelectedBodyType,
+             Converter={StaticResource BodyTypeToVisibilityConverter},
+             ConverterParameter=Text}" />
+
+			<!-- JSON BODY -->
+			<TextBox Text="{Binding JsonBodyText}"
+         AcceptsReturn="True"
+         FontFamily="Consolas"
+         VerticalScrollBarVisibility="Auto"
+         Visibility="{Binding SelectedBodyType,
+             Converter={StaticResource BodyTypeToVisibilityConverter},
+             ConverterParameter=Json}" />
+
+			<!-- FORM BODY -->
+			<Grid Visibility="{Binding SelectedBodyType,
+        Converter={StaticResource BodyTypeToVisibilityConverter},
+        ConverterParameter=FormUrlEncoded}">
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+
+				<DataGrid ItemsSource="{Binding FormItems}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False">
+
+					<DataGrid.Columns>
+
+						<DataGridTextColumn Header="Key"
+        Binding="{Binding Key}"
+        Width="200"/>
+
+						<DataGridTextColumn Header="Value"
+        Binding="{Binding Value}"
+        Width="*"/>
+
+						<DataGridTemplateColumn Width="40">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Button Content="✖"
+                                Command="{Binding RemoveCommand}"
+                                Padding="2"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+
+					</DataGrid.Columns>
+				</DataGrid>
+
+				<Button Grid.Row="1"
+            Content="+ Add field"
+            Command="{Binding AddFormItemCommand}"
+            Margin="0,8,0,0"/>
+			</Grid>
+
+		</Grid>
+
+	</Grid>
+
+</UserControl>

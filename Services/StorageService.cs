@@ -25,14 +25,14 @@ public class StorageService
         return Path.Combine(dir, FileName);
     }
 
-    public async Task SaveAsync(AppState state)
+    public void SaveAsync(AppState state)
     {
         var path = GetPath();
         var json = JsonSerializer.Serialize(state, _options);
 
         // atomic write
         var tmp = path + ".tmp";
-        await File.WriteAllTextAsync(tmp, json);
+        File.WriteAllText(tmp, json);
         File.Move(tmp, path, true);
     }
 

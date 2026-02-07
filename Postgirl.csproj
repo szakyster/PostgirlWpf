@@ -8,4 +8,9 @@
   <ItemGroup>
     <Page Include="App.xaml" />
   </ItemGroup>
+  <ItemGroup>
+    <Page Update="Presentation\Views\RequestDocument\Parts\RequestLineView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>

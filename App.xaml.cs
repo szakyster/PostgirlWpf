@@ -40,7 +40,7 @@ namespace Postgirl
                     History = _historyService.Export()
                 };
 
-                await _storageService.SaveAsync(state);
+                _storageService.SaveAsync(state);
 
                 base.OnExit(e);
             }

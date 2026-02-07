@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="Postgirl.Presentation.Views.RequestDocument.Parts.RequestTabsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:parts="clr-namespace:Postgirl.Presentation.Views.RequestDocument.Parts">
+
+	<TabControl>
+
+		<TabItem Header="Body">
+			<parts:RequestBodyView/>
+		</TabItem>
+
+		<TabItem Header="Auth">
+			<parts:RequestAuthView/>
+		</TabItem>
+
+		<TabItem Header="Headers">
+			<parts:RequestHeadersView/>
+		</TabItem>
+
+	</TabControl>
+
+</UserControl>
