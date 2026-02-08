@@ -4,6 +4,7 @@ using System.Windows.Input;
 using Postgirl.Common;
 using Postgirl.Domain.History;
 using Postgirl.Domain.Http;
+using Postgirl.Domain.SavedRequests;
 using Postgirl.Services;
 
 namespace Postgirl.Presentation.ViewModels;
@@ -13,11 +14,15 @@ public class MainViewModel : BaseViewModel
     private readonly HttpService _httpService;
     private readonly HistoryService _historyService;
     private readonly StorageService _storageService;
+    private readonly SavedRequestService _savedRequestService;
     public HistoryViewModel HistoryViewModel { get; }
+    public ObservableCollection<SavedRequestEntry> SavedRequests
+        => _savedRequestService.Items;
 
-    public MainViewModel(HttpService httpService, HistoryService historyService, StorageService storageService)
+    public MainViewModel(HttpService httpService, HistoryService historyService, StorageService storageService, SavedRequestService savedRequestService)
     {
         _storageService = storageService;
+        _savedRequestService = savedRequestService;
         _httpService = httpService;
         _historyService = historyService;
 
@@ -54,23 +59,34 @@ public class MainViewModel : BaseViewModel
     private void AddNewDocument()
     {
         var domainModel = new HttpRequestModel();
-        var doc = new RequestDocumentViewModel(_httpService, _historyService, domainModel);
+        var doc = new RequestDocumentViewModel(_httpService, _historyService, _savedRequestService, domainModel);
         Documents.Add(doc);
         ActiveDocument = doc;
     }
 
     public void OpenHistoryEntry(RequestHistoryEntry entry)
     {
-        
-
         var vm = new RequestDocumentViewModel(
             _httpService,
-            _historyService,
-            entry.ToHttpRequestModel(), entry.ToHttpResponseModel());
+            _historyService, _savedRequestService, entry.ToHttpRequestModel(), entry.ToHttpResponseModel());
         
         Documents.Add(vm);
         ActiveDocument = vm;
     }
+
+    public void OpenSaved(SavedRequestEntry entry)
+    {
+        var request = SavedRequestMapper.ToRequestModel(entry);
+
+        var vm = new RequestDocumentViewModel(
+            _httpService, _historyService, _savedRequestService,
+            request);
+        SavedRequestMapper.ApplyAuth(entry, vm.Auth);
+
+        Documents.Add(vm);
+        ActiveDocument = vm;
+    }
+
 
     private void CloseDocument(RequestDocumentViewModel doc)
     {

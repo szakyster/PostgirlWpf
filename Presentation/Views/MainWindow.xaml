@@ -47,9 +47,7 @@
 							<Expander Header="Saved Requests"
 							          IsExpanded="True"
 							          Margin="4">
-								<TextBlock Text="(saved requests will be here)"
-								           Foreground="Gray"
-								           Margin="8" />
+								<views:SavedRequestsView/>
 							</Expander>
 
 							<!-- History placeholder -->

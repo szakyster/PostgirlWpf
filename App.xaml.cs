@@ -13,6 +13,7 @@ namespace Postgirl
         private readonly HistoryService _historyService = new();
         private readonly StorageService _storageService = new();
         private readonly HttpService _httpService = new();
+        private readonly SavedRequestService _savedRequestService = new();
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -20,8 +21,9 @@ namespace Postgirl
 
             var state = await _storageService.LoadAsync();
             _historyService.Import(state.History);
+            _savedRequestService.Import(state.SavedRequests);
 
-            var mainVm = new MainViewModel(_httpService, _historyService, _storageService);
+            var mainVm = new MainViewModel(_httpService, _historyService, _storageService, _savedRequestService);
 
             MainWindow = new MainWindow
             {
@@ -37,7 +39,8 @@ namespace Postgirl
             {
                 var state = new AppState
                 {
-                    History = _historyService.Export()
+                    History = _historyService.Export(),
+                    SavedRequests = _savedRequestService.Export()
                 };
 
                 _storageService.SaveAsync(state);

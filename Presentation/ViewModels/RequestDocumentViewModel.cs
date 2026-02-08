@@ -25,24 +25,27 @@ public class RequestDocumentViewModel : BaseViewModel
     private HttpResponseResult? _response;
 
 
-    public RequestDocumentViewModel(HttpService httpService, HistoryService historyService, HttpRequestModel request, HttpResponseResult response = null)
+    public RequestDocumentViewModel(HttpService httpService, HistoryService historyService, SavedRequestService savedRequestService, HttpRequestModel request, HttpResponseResult response = null)
     {
         _httpService = httpService;
         _historyService = historyService;
         _request = request;
+        _savedRequestService = savedRequestService;
         _response = response;
         SendCommand = new AsyncRelayCommand(SendAsync);
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
         AddFormItemCommand = new RelayCommand(AddFormItem);
+        SaveRequestCommand = new RelayCommand(SaveRequest);
 
         RequestHeaders = new ObservableCollection<RequestHeaderItemViewModel>(
             _request.Headers.Select(h => new RequestHeaderItemViewModel(h, RemoveHeader))
         );
-
+        SyncDomainToBody();
         Auth = new RequestAuthViewModel();
         Auth.PropertyChanged += OnAuthChanged;
     }
 
+    public HttpRequestModel Domain => _request;
 
     public RequestAuthViewModel Auth { get; }
 
@@ -143,6 +146,8 @@ public class RequestDocumentViewModel : BaseViewModel
     }
 
     private BodyType _selectedBodyType;
+    private readonly SavedRequestService _savedRequestService;
+
     public BodyType SelectedBodyType
     {
         get => _selectedBodyType;
@@ -195,7 +200,41 @@ public class RequestDocumentViewModel : BaseViewModel
                 break;
         }
     }
-    
+
+    private void SyncDomainToBody()
+    {
+        var requestBody = _request.Body;
+        SelectedBodyType = requestBody.Type;
+        switch (requestBody.Type)
+        {
+            case BodyType.Text:
+                TextBodyText = requestBody.ToString();
+                break;
+
+            case BodyType.Json:
+                JsonBodyText = requestBody.ToString();
+
+                break;
+
+            case BodyType.FormUrlEncoded:
+                var formUrlEncodedBody = (FormUrlEncodedBody)requestBody;
+                FormItems.Clear();
+                foreach (var item in formUrlEncodedBody.Items)
+                {
+                    var wm = new FormItemViewModel(item, RemoveFormItem);
+                    FormItems.Add(wm);
+                }
+
+                break;
+
+            case BodyType.None:
+            case BodyType.Xml:
+            default:
+                _request.Body = null;
+                break;
+        }
+    }
+
     #region response
     public string ResponseBody
     {
@@ -257,6 +296,7 @@ public class RequestDocumentViewModel : BaseViewModel
     public ICommand SendCommand { get; }
     public ICommand AddHeaderCommand { get; }
     public ICommand AddFormItemCommand { get; }
+    public ICommand SaveRequestCommand { get; }
 
     private async Task SendAsync()
     {
@@ -352,6 +392,7 @@ public class RequestDocumentViewModel : BaseViewModel
             e.PropertyName == nameof(RequestAuthViewModel.BearerToken))
         {
             SyncAuthorizationHeader();
+            _request.BearerToken = Auth.AuthType == AuthType.BearerToken ? Auth.BearerToken : null;
         }
     }
 
@@ -387,4 +428,12 @@ public class RequestDocumentViewModel : BaseViewModel
         foreach (var h in ordered)
             RequestHeaders.Add(h);
     }
+
+    private void SaveRequest()
+    {
+        _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
+        var entry = SavedRequestMapper.FromViewModel(this);
+        _savedRequestService.Add(entry);
+    }
+
 }

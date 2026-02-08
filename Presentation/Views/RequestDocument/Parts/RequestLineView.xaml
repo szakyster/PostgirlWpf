@@ -17,10 +17,17 @@ ItemsSource="{Binding HttpMethods}" />
 Margin="10,0"
 Text="{Binding Url}" />
 
-    <Button Grid.Column="2"
-Width="100"
-Content="Send"
-Command="{Binding SendCommand}" />
+    <StackPanel Grid.Column="2" Orientation="Horizontal"  >
 
-    </Grid>
+	    <Button Width="80"
+	            Content="Send"
+	            Command="{Binding SendCommand}" />
+
+	    <Button Width="60"
+	            Content="Save"
+	            Command="{Binding SaveRequestCommand}" />
+
+    </StackPanel>
+
+	</Grid>
     </UserControl>

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using Postgirl.Domain.History;
+using Postgirl.Domain.SavedRequests;
 
 namespace Postgirl.Domain.Persistence;
 
 public class AppState
 {
     public List<RequestHistoryEntry> History { get; set; } = [];
+    public List<SavedRequestEntry> SavedRequests { get; set; } = [];
 
-    // később:
-    // public List<SavedRequest> SavedRequests { get; set; }
-    // public List<OpenDocument> OpenDocuments { get; set; }
 }
