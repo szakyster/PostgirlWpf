@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Postgirl.Domain.Http;
-using Postgirl.Domain.Authentication;
 using Postgirl.Domain.History;
 using Postgirl.Domain.Http.Body;
+using Postgirl.Domain.SavedRequests;
+using Postgirl.Presentation.ViewModels.Authentication;
 
 namespace Postgirl.Services;
 
@@ -18,6 +18,40 @@ public static class HistoryMapper
             Url = entry.Url,
             Headers = MapHeaders(entry)
         };
+
+        switch (entry.BodyType)
+        {
+            case BodyType.Text:
+                requestModel.Body = new TextBody
+                {
+                    Text = entry.BodyText ?? ""
+                };
+                break;
+
+            case BodyType.Json:
+                requestModel.Body = new JsonBody
+                {
+                    Json = entry.BodyJson ?? ""
+                };
+                break;
+
+            case BodyType.FormUrlEncoded:
+                var form = new FormUrlEncodedBody();
+
+                if (entry.FormItems != null)
+                {
+                    foreach (var item in entry.FormItems)
+                        form.Items.Add(item.Copy());
+                }
+
+                requestModel.Body = form;
+                break;
+
+            default:
+                requestModel.Body = new TextBody { Text = "" };
+                break;
+        }
+
         return requestModel;
     }
 
@@ -33,9 +67,55 @@ public static class HistoryMapper
             StatusCode = entry.StatusCode,
             Body = entry.ResponseBody,
             ElapsedMilliseconds = entry.DurationMs,
-            Headers = new List<string>() // Placeholder, as headers are not stored in history
-            
+            Headers = entry.ResponseHeaders ?? new List<string>()
+
         };
         return responseModel;
+    }
+
+    // =========================
+    // BODY: REQUEST -> SAVED
+    // =========================
+    public static void AddMapBodyFromRequest(
+        this RequestHistoryEntry entry, HttpRequestModel request)
+    {
+        if (request.Body == null)
+            return;
+
+        switch (request.Body)
+        {
+            case TextBody text:
+                entry.BodyType = BodyType.Text;
+                entry.BodyText = text.Text ?? "";
+                break;
+
+            case JsonBody json:
+                entry.BodyType = BodyType.Json;
+                entry.BodyJson = json.Json ?? "";
+                break;
+
+            case FormUrlEncodedBody form:
+                entry.BodyType = BodyType.FormUrlEncoded;
+                entry.FormItems = form.Items
+                    .Select(i => i.Copy())
+                    .ToList();
+                break;
+
+            default:
+                entry.BodyType = BodyType.None;
+                break;
+        }
+
+    }
+ 
+    // =========================
+    // SAVED ENTRY -> AUTH VM
+    // =========================
+    public static void ApplyAuth(
+        RequestHistoryEntry entry,
+        RequestAuthViewModel authVm)
+    {
+        authVm.AuthType = entry.AuthType;
+        authVm.BearerToken = entry.BearerToken;
     }
 }

@@ -66,10 +66,13 @@ public class MainViewModel : BaseViewModel
 
     public void OpenHistoryEntry(RequestHistoryEntry entry)
     {
+
+        var request = entry.ToHttpRequestModel();
         var vm = new RequestDocumentViewModel(
             _httpService,
-            _historyService, _savedRequestService, entry.ToHttpRequestModel(), entry.ToHttpResponseModel());
-        
+            _historyService, _savedRequestService, request, entry.ToHttpResponseModel());
+        HistoryMapper.ApplyAuth(entry, vm.Auth);
+
         Documents.Add(vm);
         ActiveDocument = vm;
     }

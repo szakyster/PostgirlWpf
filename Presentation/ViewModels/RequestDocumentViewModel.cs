@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Postgirl.Common;
@@ -41,6 +42,7 @@ public class RequestDocumentViewModel : BaseViewModel
             _request.Headers.Select(h => new RequestHeaderItemViewModel(h, RemoveHeader))
         );
         SyncDomainToBody();
+        FormItems.CollectionChanged += (s, e) => SyncBodyToDomain();
         Auth = new RequestAuthViewModel();
         Auth.PropertyChanged += OnAuthChanged;
     }
@@ -300,6 +302,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
     private async Task SendAsync()
     {
+        SyncBodyToDomain();
         var toRemove = RequestHeaders
             .Where(h => !h.IsSystem && !h.HasValidKey())
             .ToList();
@@ -323,13 +326,21 @@ public class RequestDocumentViewModel : BaseViewModel
         {
             Method = _request.Method,
             Url = _request.Url,
-            StatusCode = _response.StatusCode,
-            DurationMs = _response.ElapsedMilliseconds,
+
             Headers = _request.Headers.Where(h => !string.IsNullOrWhiteSpace(h.Key))
                 .Select(h => h.Copy())
                 .ToList(),
-            ResponseBody = _response.Body
+
+            AuthType = Auth.AuthType,
+            BearerToken = Auth.BearerToken,
+
+            ResponseBody = _response.Body ?? string.Empty,
+            ResponseHeaders = ResponseHeaders.ToList(),
+            StatusCode = _response.StatusCode,
+            DurationMs = _response.ElapsedMilliseconds,
         };
+        historyEntry.AddMapBodyFromRequest(_request);
+
         _historyService.Add(historyEntry);
     }
 
@@ -431,6 +442,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
     private void SaveRequest()
     {
+        SyncBodyToDomain();
         _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
         var entry = SavedRequestMapper.FromViewModel(this);
         _savedRequestService.Add(entry);
