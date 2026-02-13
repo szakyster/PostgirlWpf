@@ -6,10 +6,10 @@ namespace Postgirl.Presentation.Views
 {
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(MainViewModel vm)
         {
-            InitializeComponent();
-            //DataContext = new MainViewModel(new HttpService(), new HistoryService(),new StorageService());
+            InitializeComponent(); 
+            DataContext = vm;
         }
     }
 }
