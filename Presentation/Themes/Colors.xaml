@@ -1,0 +1,27 @@
+﻿<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<!-- Background Layers -->
+	<Color x:Key="Color.AppBackground">#2A2D34</Color>
+	<Color x:Key="Color.Surface">#323641</Color>
+	<Color x:Key="Color.SurfaceElevated">#3B3F4C</Color>
+
+	<!-- Text -->
+	<Color x:Key="Color.TextPrimary">#E8EAED</Color>
+	<Color x:Key="Color.TextSecondary">#A5AAB3</Color>
+
+	<!-- Border -->
+	<Color x:Key="Color.Border">#454A57</Color>
+
+	<!-- Accent -->
+	<Color x:Key="Color.Accent">#1EC8A5</Color>
+	<Color x:Key="Color.AccentHover">#18B094</Color>
+	<Color x:Key="Color.AccentPressed">#12907A</Color>
+
+	<!-- Status -->
+	<Color x:Key="Color.Success">#3ECF8E</Color>
+	<Color x:Key="Color.Warning">#F5B041</Color>
+	<Color x:Key="Color.Error">#E74C3C</Color>
+
+</ResourceDictionary>

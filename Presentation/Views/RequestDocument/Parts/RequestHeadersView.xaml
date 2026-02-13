@@ -34,6 +34,7 @@
 
 				<!-- KEY -->
 				<DataGridTextColumn
+					
 					Header="Header"
 					Binding="{Binding Key}"
 					Width="200"
@@ -56,7 +57,8 @@
 							        Command="{Binding RemoveCommand}"
 							        IsEnabled="{Binding CanEdit}"
 							        ToolTip="Remove header"
-							        Padding="2"/>
+							        Padding="2"
+							        Style="{StaticResource GhostButtonStyle}"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>

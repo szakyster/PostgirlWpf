@@ -18,7 +18,7 @@
 			</TabItem>
 			<TabItem Header="Headers">
 				<ListBox ItemsSource="{Binding ResponseHeaders}"
-				         FontFamily="Consolas"/>
+				         FontFamily="Consolas"  />
 			</TabItem>
 		</TabControl>
 	</Grid>

@@ -9,7 +9,11 @@
 			<converters:BodyTypeToVisibilityConverter x:Key="BodyTypeToVisibilityConverter"/>
 		    <converters:StatusCodeToVisibilityConverter x:Key="StatusCodeToVisibilityConverter" />
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="Presentation/Views/HeaderStyles.xaml" />
+				<ResourceDictionary Source="Presentation/Themes/Colors.xaml"/>
+				<ResourceDictionary Source="Presentation/Themes/Brushes.xaml"/>
+				<ResourceDictionary Source="/Presentation/Themes/HeaderStyles.xaml" />
+				<ResourceDictionary Source="Presentation/Themes/Controls.Base.xaml"/>
+				<ResourceDictionary Source="Presentation/Themes/Controls.Buttons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 	    </ResourceDictionary>
 	</Application.Resources>

@@ -2,15 +2,56 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:Postgirl.Presentation.Views"
-        Title="Postgirl" Height="600" Width="1024">
+        Title="Postgirl" Height="750" Width="1024"
+        Icon="/Assets/postgirl.ico"
+        Background="{StaticResource Brush.Background}">
 
-	<DockPanel>
+	<DockPanel Background="{StaticResource Brush.Surface}">
 
-		<!-- Top bar -->
-		<ToolBar DockPanel.Dock="Top">
-			<Button Content="+ New"
-			        Command="{Binding NewTabCommand}" />
-		</ToolBar>
+		<!-- top bar -->
+		<Border DockPanel.Dock="Top"
+		        Background="{StaticResource Brush.SurfaceElevated}"
+		        BorderBrush="{StaticResource Brush.Border}"
+		        BorderThickness="0,0,0,1"
+		        Padding="12,8">
+
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+
+				<!-- LEFT ACTIONS -->
+				<StackPanel Orientation="Horizontal"
+				            VerticalAlignment="Center">
+
+					<Button Content="+ New"
+					        Command="{Binding NewTabCommand}"
+					        Style="{StaticResource AccentButtonStyle}"
+					        Margin="0,0,8,0"
+							Padding="10, 0, 10, 0"
+					        />
+
+				</StackPanel>
+
+				<!-- CENTER (reserved for future search maybe) -->
+				<ContentControl Grid.Column="1"/>
+
+				<!-- RIGHT SIDE (future environment selector) -->
+				<StackPanel Grid.Column="2"
+				            Orientation="Horizontal"
+				            VerticalAlignment="Center">
+
+					<!-- Future: Environment selector -->
+					<!-- <ComboBox Width="180"/> -->
+
+				</StackPanel>
+
+			</Grid>
+
+		</Border>
+
 
 		<!-- Main content -->
 		<Grid>
@@ -21,47 +62,49 @@
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 
+			<!-- =====================  -->
+			<!-- Left Sidebar           -->
 			<!-- ===================== -->
-			<!-- Left sidebar (container) -->
-			<!-- ===================== -->
+
 			<Border Grid.Column="0"
-			        Background="#1E1E1E"
-			        BorderBrush="#333"
+			        Width="auto"
+			        Background="{StaticResource Brush.SurfaceElevated}"
+			        BorderBrush="{StaticResource Brush.Border}"
 			        BorderThickness="0,0,1,0">
 
-				<DockPanel>
+				<DockPanel Background="Transparent">
 
-					<!-- Sidebar header (később toolbar is lehet) -->
-					<TextBlock DockPanel.Dock="Top"
-					           Text="Requests"
-					           FontWeight="SemiBold"
-					           Foreground="White"
-					           Padding="10"
-					           Opacity="0.8" />
+					<!-- Content -->
+					<ScrollViewer VerticalScrollBarVisibility="Auto"
+					              Background="Transparent">
 
-					<!-- Placeholder for lists -->
-					<ScrollViewer VerticalScrollBarVisibility="Auto" Background="AliceBlue">
-						<StackPanel>
+						<StackPanel Margin="8,0,8,12">
 
-							<!-- Saved Requests placeholder -->
+							<!-- Saved -->
 							<Expander Header="Saved Requests"
 							          IsExpanded="True"
-							          Margin="4">
+							          Margin="0,0,0,12">
+
 								<views:SavedRequestsView/>
+
 							</Expander>
 
-							<!-- History placeholder -->
+							<!-- History -->
 							<Expander Header="History"
-							          IsExpanded="True"
-							          Margin="4">
+							          IsExpanded="True">
+
 								<views:HistoryView DataContext="{Binding HistoryViewModel}"/>
+
 							</Expander>
 
 						</StackPanel>
+
 					</ScrollViewer>
 
 				</DockPanel>
+
 			</Border>
+
 
 			<!-- ===================== -->
 			<!-- Tabs / main content -->
@@ -70,11 +113,11 @@
 			            ItemsSource="{Binding Documents}"
 		            SelectedItem="{Binding ActiveDocument}">
 
-			<TabControl.ItemTemplate>
-				<DataTemplate>
-					<DockPanel LastChildFill="False">
+				<TabControl.ItemTemplate>
+					<DataTemplate>
+						<DockPanel LastChildFill="False">
 
-						<Button DockPanel.Dock="Right"
+							<Button DockPanel.Dock="Right"
 						        Content="✕"
 						        Width="18"
 						        Height="18"
@@ -85,21 +128,21 @@
                                   RelativeSource={RelativeSource AncestorType=Window}}"
 						        CommandParameter="{Binding}" />
 
-						<TextBlock Text="{Binding Title}"
+							<TextBlock Text="{Binding Title}"
 						           VerticalAlignment="Center"
 						           Margin="0,0,5,0" />
 
-					</DockPanel>
-				</DataTemplate>
+						</DockPanel>
+					</DataTemplate>
 				</TabControl.ItemTemplate>
 
-			<TabControl.ContentTemplate>
-				<DataTemplate>
-					<views:RequestDocumentView />
-				</DataTemplate>
-			</TabControl.ContentTemplate>
+				<TabControl.ContentTemplate>
+					<DataTemplate>
+						<views:RequestDocumentView />
+					</DataTemplate>
+				</TabControl.ContentTemplate>
 
-		</TabControl>
+			</TabControl>
 		</Grid>
 	</DockPanel>
 </Window>
