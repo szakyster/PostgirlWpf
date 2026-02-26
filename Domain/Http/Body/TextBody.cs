@@ -1,12 +1,19 @@
-﻿namespace Postgirl.Domain.Http.Body;
+﻿using System.Net.Http;
+using System.Text;
+
+namespace Postgirl.Domain.Http.Body;
 
 public class TextBody : HttpBody
 {
     public override BodyType Type => BodyType.Text;
-    public string Text { get; set; }
+    public string Content { get; set; } = "";
+    public string ContentType { get; set; } = "text/plain";
 
-    public override string ToString()
+    public override HttpContent? ToHttpContent()
     {
-        return Text;
+        if (string.IsNullOrWhiteSpace(Content))
+            return null;
+
+        return new StringContent(Content, Encoding.UTF8, ContentType);
     }
 }

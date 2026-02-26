@@ -35,13 +35,3 @@ internal class HttpError
         };
     }
 }
-
-public enum HttpErrorType
-{
-    Unknown,
-    Timeout,
-    Network,
-    DnsFailure,
-    SslError,
-    Cancelled
-}

@@ -159,8 +159,8 @@ public class RequestDocumentViewModel : BaseViewModel
             {
                 _selectedBodyType = value;
                 OnPropertyChanged();
-                UpdateSystemHeaders();
                 SyncBodyToDomain();
+                UpdateSystemHeaders();
             }
         }
     }
@@ -172,7 +172,7 @@ public class RequestDocumentViewModel : BaseViewModel
             case BodyType.Text:
                 _request.Body = new TextBody
                 {
-                    Text = TextBodyText
+                    Content = TextBodyText
                 };
                 break;
 
@@ -346,16 +346,14 @@ public class RequestDocumentViewModel : BaseViewModel
 
     private void UpdateSystemHeaders()
     {
-        var contentType = SelectedBodyType switch
+        var headers = _request.Body?.ToHttpContent()?.Headers;
+        if (headers != null)
         {
-            BodyType.Json => "application/json",
-            BodyType.Xml => "application/xml",
-            BodyType.Text => "text/plain",
-            BodyType.FormUrlEncoded => "application/x-www-form-urlencoded",
-            _ => null
-        };
-
-        AddSystemHeader("Content-Type", contentType);
+            foreach (var header in headers)
+            {
+                AddSystemHeader(header.Key, string.Join(", ", header.Value));
+            }
+        }
     }
 
     private void AddSystemHeader(string key, string value)

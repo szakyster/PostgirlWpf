@@ -24,7 +24,7 @@ public static class HistoryMapper
             case BodyType.Text:
                 requestModel.Body = new TextBody
                 {
-                    Text = entry.BodyText ?? ""
+                    Content = entry.BodyText ?? ""
                 };
                 break;
 
@@ -48,7 +48,7 @@ public static class HistoryMapper
                 break;
 
             default:
-                requestModel.Body = new TextBody { Text = "" };
+                requestModel.Body = new TextBody { Content = "" };
                 break;
         }
 
@@ -86,7 +86,7 @@ public static class HistoryMapper
         {
             case TextBody text:
                 entry.BodyType = BodyType.Text;
-                entry.BodyText = text.Text ?? "";
+                entry.BodyText = text.Content ?? "";
                 break;
 
             case JsonBody json:
