@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Postgirl.Common;
@@ -20,17 +19,17 @@ namespace Postgirl.Presentation.ViewModels;
 
 public class RequestDocumentViewModel : BaseViewModel
 {
-    private readonly HttpService _httpService;
     private readonly HistoryService _historyService;
     private readonly HttpRequestModel _request;
+    private readonly IHttpExecutor _httpExecutor;
     private HttpResponseResult? _response;
 
 
-    public RequestDocumentViewModel(HttpService httpService, HistoryService historyService, SavedRequestService savedRequestService, HttpRequestModel request, HttpResponseResult response = null)
+    public RequestDocumentViewModel(IHttpExecutor httpExecutor, HistoryService historyService, SavedRequestService savedRequestService, HttpRequestModel request, HttpResponseResult response = null)
     {
-        _httpService = httpService;
         _historyService = historyService;
         _request = request;
+        _httpExecutor = httpExecutor;
         _savedRequestService = savedRequestService;
         _response = response;
         SendCommand = new AsyncRelayCommand(SendAsync);
@@ -113,7 +112,11 @@ public class RequestDocumentViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _textBodyText, value))
+            {
                 SyncBodyToDomain();
+                UpdateSystemHeaders();
+            }
+                
         }
     }
 
@@ -124,7 +127,11 @@ public class RequestDocumentViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _jsonBodyText, value))
+            {
                 SyncBodyToDomain();
+                UpdateSystemHeaders();
+            }
+                
         }
     }
 
@@ -134,12 +141,14 @@ public class RequestDocumentViewModel : BaseViewModel
     private void RemoveFormItem(FormItemViewModel item)
     {
         FormItems.Remove(item);
+        UpdateSystemHeaders();
     }
     private void AddFormItem()
     {
         var domain = new FormUrlEncodedItem();
         var vm = new FormItemViewModel(domain, RemoveFormItem);
         FormItems.Add(vm);
+        UpdateSystemHeaders();
     }
 
     public ObservableCollection<RequestHeaderItemViewModel> RequestHeaders
@@ -159,8 +168,8 @@ public class RequestDocumentViewModel : BaseViewModel
             {
                 _selectedBodyType = value;
                 OnPropertyChanged();
-                UpdateSystemHeaders();
                 SyncBodyToDomain();
+                UpdateSystemHeaders();
             }
         }
     }
@@ -172,7 +181,7 @@ public class RequestDocumentViewModel : BaseViewModel
             case BodyType.Text:
                 _request.Body = new TextBody
                 {
-                    Text = TextBodyText
+                    Content = TextBodyText
                 };
                 break;
 
@@ -313,8 +322,23 @@ public class RequestDocumentViewModel : BaseViewModel
         }
 
         _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
+        var executionResult = await _httpExecutor.ExecuteAsync(_request);
+        if (executionResult.IsSuccess)
+        {
+            _response = executionResult.Response;
+        }
+        else
+        {
+            _response = new HttpResponseResult
+            {
+                StatusCode = 0,
+                Body = executionResult.Error?.Message ?? "Unknown error",
+                Headers = new List<string>(),
+                ElapsedMilliseconds = executionResult.ElapsedMilliseconds,
+                ResponseSize = 0
+            };
+        }
 
-        _response = await _httpService.SendAsync(_request);
         OnPropertyChanged(nameof(StatusCode));
         OnPropertyChanged(nameof(StatusColor));
         OnPropertyChanged(nameof(StatusText));
@@ -346,29 +370,34 @@ public class RequestDocumentViewModel : BaseViewModel
 
     private void UpdateSystemHeaders()
     {
-        var contentType = SelectedBodyType switch
+        var headers = _request.Body?.ToHttpContent()?.Headers;
+        if (headers != null)
         {
-            BodyType.Json => "application/json",
-            BodyType.Xml => "application/xml",
-            BodyType.Text => "text/plain",
-            BodyType.FormUrlEncoded => "application/x-www-form-urlencoded",
-            _ => null
-        };
-
-        AddSystemHeader("Content-Type", contentType);
+            foreach (var header in headers)
+            {
+                AddSystemHeader(header.Key, string.Join(", ", header.Value));
+            }
+        }
+        else
+        {
+            this.RemoveSystemHeader("Content-Type");
+        }
     }
 
     private void AddSystemHeader(string key, string value)
     {
-        var existing = RequestHeaders
-            .FirstOrDefault(h => h.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
-
-        if (existing != null)
-            RequestHeaders.Remove(existing);
-
+        RemoveSystemHeader(key);
         var header = new RequestHeader(key, value, isSystem: true);
         RequestHeaders.Add(new RequestHeaderItemViewModel(header, RemoveHeader));
         SortHeaders();
+    }
+
+    private void RemoveSystemHeader(string key)
+    {
+        var existing = RequestHeaders
+            .FirstOrDefault(h => h.IsSystem && h.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
+        if (existing != null)
+            RequestHeaders.Remove(existing);
     }
 
     public void AddUserHeader(string key, string value)

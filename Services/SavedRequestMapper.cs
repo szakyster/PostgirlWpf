@@ -80,7 +80,7 @@ public static class SavedRequestMapper
         {
             case TextBody text:
                 entry.BodyType = BodyType.Text;
-                entry.BodyText = text.Text ?? "";
+                entry.BodyText = text.Content ?? "";
                 break;
 
             case JsonBody json:
@@ -113,7 +113,7 @@ public static class SavedRequestMapper
             case BodyType.Text:
                 model.Body = new TextBody
                 {
-                    Text = entry.BodyText ?? ""
+                    Content = entry.BodyText ?? ""
                 };
                 break;
 
@@ -137,7 +137,7 @@ public static class SavedRequestMapper
                 break;
 
             default:
-                model.Body = new TextBody { Text = "" };
+                model.Body = new TextBody { Content= "" };
                 break;
         }
     }

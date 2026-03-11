@@ -11,7 +11,7 @@ using Postgirl.Domain.Http;
 
 namespace Postgirl.Services
 {
-    internal class HttpExecutor : IHttpExecutor
+    public class HttpExecutor : IHttpExecutor
     {
         private static readonly HttpClient Client = new();
 
@@ -30,7 +30,7 @@ namespace Postgirl.Services
                     HttpCompletionOption.ResponseHeadersRead,
                     cancellationToken);
 
-                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
                 stopwatch.Stop();
 
@@ -42,8 +42,9 @@ namespace Postgirl.Services
                     {
                         StatusCode = (int)response.StatusCode,
                         Headers = ExtractHeaders(response),
-                        Body = body,
-                        ResponseSize = Encoding.UTF8.GetByteCount(body)
+                        Body = responseBody,
+                        ResponseSize = Encoding.UTF8.GetByteCount(responseBody),
+                        ElapsedMilliseconds = stopwatch.ElapsedMilliseconds
                     }
                 };
             }
@@ -73,12 +74,15 @@ namespace Postgirl.Services
                 }
             }
 
-            if (model.Body != null && !string.IsNullOrWhiteSpace(model.Body.ToString()))
+            if (model.Method == HttpMethod.Get || model.Method == HttpMethod.Head)
             {
-                request.Content = new StringContent(
-                    model.Body.ToString() ?? string.Empty,
-                    Encoding.UTF8,
-                    "application/json"); // később BodyType alapján
+                return request; // ignore body
+            }
+
+            var content = model.Body?.ToHttpContent();
+            if (content != null)
+            {
+                request.Content = content;
             }
 
             return request;

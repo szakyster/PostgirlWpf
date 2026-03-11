@@ -11,19 +11,20 @@ namespace Postgirl.Presentation.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    private readonly HttpService _httpService;
+    private readonly IHttpExecutor _httpExecutor;
     private readonly HistoryService _historyService;
     private readonly StorageService _storageService;
     private readonly SavedRequestService _savedRequestService;
+    
     public HistoryViewModel HistoryViewModel { get; }
     public ObservableCollection<SavedRequestEntry> SavedRequests
         => _savedRequestService.Items;
 
-    public MainViewModel(HttpService httpService, HistoryService historyService, StorageService storageService, SavedRequestService savedRequestService)
+    public MainViewModel(IHttpExecutor httpExecutor, HistoryService historyService, StorageService storageService, SavedRequestService savedRequestService)
     {
         _storageService = storageService;
         _savedRequestService = savedRequestService;
-        _httpService = httpService;
+        _httpExecutor = httpExecutor;
         _historyService = historyService;
 
         HistoryViewModel = new HistoryViewModel(historyService, this);
@@ -33,7 +34,7 @@ public class MainViewModel : BaseViewModel
 
         LoadState();
 
-        AddNewDocument(); // első fül
+        AddNewDocument();
     }
 
     private async void LoadState()
@@ -59,17 +60,16 @@ public class MainViewModel : BaseViewModel
     private void AddNewDocument()
     {
         var domainModel = new HttpRequestModel();
-        var doc = new RequestDocumentViewModel(_httpService, _historyService, _savedRequestService, domainModel);
+        var doc = new RequestDocumentViewModel(_httpExecutor, _historyService, _savedRequestService, domainModel);
         Documents.Add(doc);
         ActiveDocument = doc;
     }
 
     public void OpenHistoryEntry(RequestHistoryEntry entry)
     {
-
         var request = entry.ToHttpRequestModel();
         var vm = new RequestDocumentViewModel(
-            _httpService,
+            _httpExecutor,
             _historyService, _savedRequestService, request, entry.ToHttpResponseModel());
         HistoryMapper.ApplyAuth(entry, vm.Auth);
 
@@ -82,14 +82,13 @@ public class MainViewModel : BaseViewModel
         var request = SavedRequestMapper.ToRequestModel(entry);
 
         var vm = new RequestDocumentViewModel(
-            _httpService, _historyService, _savedRequestService,
+            _httpExecutor, _historyService, _savedRequestService,
             request);
         SavedRequestMapper.ApplyAuth(entry, vm.Auth);
 
         Documents.Add(vm);
         ActiveDocument = vm;
     }
-
 
     private void CloseDocument(RequestDocumentViewModel doc)
     {

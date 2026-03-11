@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Postgirl.Domain.Execution;
 
-internal class HttpError
+public class HttpError
 {
     public HttpErrorType Type { get; init; }
     public string Message { get; init; } = "";
@@ -34,14 +34,4 @@ internal class HttpError
             }
         };
     }
-}
-
-public enum HttpErrorType
-{
-    Unknown,
-    Timeout,
-    Network,
-    DnsFailure,
-    SslError,
-    Cancelled
 }

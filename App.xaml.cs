@@ -63,7 +63,6 @@ namespace Postgirl
             services.AddSingleton<HistoryService>();
             services.AddSingleton<SavedRequestService>();
             services.AddSingleton<StorageService>();
-            services.AddSingleton<HttpService>();
             
             //WMs
             services.AddSingleton<MainViewModel>();

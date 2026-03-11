@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Postgirl.Domain.Http.Body;
 
@@ -13,4 +14,8 @@ public class HttpRequestModel
     public HttpBody Body { get; set; } = new TextBody();
 
     public string BearerToken { get; set; } = string.Empty;
+
+    public TimeSpan? Timeout { get; set; }
+    public bool FollowRedirects { get; set; } = true;
+    public bool IgnoreSslErrors { get; set; }
 }
