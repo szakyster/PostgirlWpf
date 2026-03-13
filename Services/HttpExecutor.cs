@@ -63,7 +63,7 @@ namespace Postgirl.Services
 
         private HttpRequestMessage BuildRequestMessage(HttpRequestModel model)
         {
-            var request = new HttpRequestMessage(model.Method, model.Url);
+            var request = new HttpRequestMessage(model.Method, BuildUrlWithParameters(model.Url, model.Parameters));
 
             foreach (var header in model.Headers.Where(h => h.IsEnabled))
             {
@@ -86,6 +86,36 @@ namespace Postgirl.Services
             }
 
             return request;
+        }
+
+        private string BuildUrlWithParameters(string baseUrl, IList<RequestParameter> parameters)
+        {
+            var enabledParams = parameters?.Where(p => p.IsEnabled && !string.IsNullOrWhiteSpace(p.Key)).ToList();
+
+            if (enabledParams == null || enabledParams.Count == 0)
+            {
+                return baseUrl;
+            }
+
+            var uriBuilder = new UriBuilder(baseUrl);
+            var queryParams = new List<string>();
+
+            // Meglévő query paramétereket megtartjuk
+            if (!string.IsNullOrEmpty(uriBuilder.Query))
+            {
+                queryParams.Add(uriBuilder.Query.TrimStart('?'));
+            }
+
+            // Új paramétereket hozzáadjuk
+            foreach (var param in enabledParams)
+            {
+                var encodedKey = Uri.EscapeDataString(param.Key);
+                var encodedValue = Uri.EscapeDataString(param.Value ?? "");
+                queryParams.Add($"{encodedKey}={encodedValue}");
+            }
+
+            uriBuilder.Query = string.Join("&", queryParams);
+            return uriBuilder.Uri.ToString();
         }
 
         private List<string> ExtractHeaders(HttpResponseMessage response)
