@@ -36,12 +36,16 @@ public class RequestDocumentViewModel : BaseViewModel
         _response = response;
         SendCommand = new AsyncRelayCommand(SendAsync);
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
+        AddParameterCommand = new RelayCommand(() => { AddParameter("param", ""); });
         AddFormItemCommand = new RelayCommand(AddFormItem);
         SaveRequestCommand = new RelayCommand(SaveRequest);
         CancelCommand = new RelayCommand(CancelRequest);
 
         RequestHeaders = new ObservableCollection<RequestHeaderItemViewModel>(
             _request.Headers.Select(h => new RequestHeaderItemViewModel(h, RemoveHeader))
+        );
+        RequestParameters = new ObservableCollection<RequestParameterItemViewModel>(
+            _request.Parameters.Select(p => new RequestParameterItemViewModel(p, RemoveParameter))
         );
         SyncDomainToBody();
         FormItems.CollectionChanged += (_, _) => SyncBodyToDomain();
@@ -164,6 +168,11 @@ public class RequestDocumentViewModel : BaseViewModel
     }
 
     public ObservableCollection<RequestHeaderItemViewModel> RequestHeaders
+    {
+        get;
+    }
+
+    public ObservableCollection<RequestParameterItemViewModel> RequestParameters
     {
         get;
     }
@@ -318,6 +327,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
     public ICommand SendCommand { get; }
     public ICommand AddHeaderCommand { get; }
+    public ICommand AddParameterCommand { get; }
     public ICommand AddFormItemCommand { get; }
     public ICommand SaveRequestCommand { get; }
     public ICommand CancelCommand { get; }
@@ -347,7 +357,17 @@ public class RequestDocumentViewModel : BaseViewModel
                 RemoveHeader(header);
             }
 
+            var parametersToRemove = RequestParameters
+                .Where(p => !p.HasValidKey())
+                .ToList();
+
+            foreach (var parameter in parametersToRemove)
+            {
+                RemoveParameter(parameter);
+            }
+
             _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
+            _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
             var executionResult = await _httpExecutor.ExecuteAsync(_request, _cancellationTokenSource.Token);
 
             if (_cancellationTokenSource.Token.IsCancellationRequested)
@@ -468,6 +488,17 @@ public class RequestDocumentViewModel : BaseViewModel
         RequestHeaders.Remove(headerVm);
     }
 
+    public void AddParameter(string key, string value)
+    {
+        var parameter = new RequestParameter(key, value);
+        RequestParameters.Add(new RequestParameterItemViewModel(parameter, RemoveParameter));
+    }
+
+    private void RemoveParameter(RequestParameterItemViewModel parameterVm)
+    {
+        RequestParameters.Remove(parameterVm);
+    }
+
     private static HttpMethod GetHttpMethod(string method)
     {
         var httpMethod = method.ToUpper() switch
@@ -529,6 +560,7 @@ public class RequestDocumentViewModel : BaseViewModel
     {
         SyncBodyToDomain();
         _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
+        _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
         var entry = SavedRequestMapper.FromViewModel(this);
         _savedRequestService.Add(entry);
     }

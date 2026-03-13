@@ -1,0 +1,67 @@
+<UserControl x:Class="Postgirl.Presentation.Views.RequestDocument.Parts.RequestParametersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<!-- ADD PARAMETER BUTTON -->
+		<Button Content="+ Add Parameter"
+		        Command="{Binding AddParameterCommand}"
+		        HorizontalAlignment="Left"
+		        Margin="0,0,0,8"/>
+
+		<!-- PARAMETERS GRID -->
+		<DataGrid Grid.Row="1"
+		          ItemsSource="{Binding RequestParameters}"
+		          AutoGenerateColumns="False"
+		          CanUserAddRows="False"
+		          VerticalScrollBarVisibility="Auto">
+
+			<DataGrid.Columns>
+
+				<!-- ENABLE -->
+				<DataGridTemplateColumn Width="40">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<CheckBox IsChecked="{Binding IsEnabled}"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- KEY -->
+				<DataGridTextColumn
+					Header="Parameter"
+					Binding="{Binding Key}"
+					Width="200"
+					ElementStyle="{StaticResource HeaderValueTextStyle}"
+					EditingElementStyle="{StaticResource HeaderValueEditStyle}" />
+
+				<!-- VALUE -->
+				<DataGridTextColumn
+					Header="Value"
+					Binding="{Binding Value}"
+					Width="*"
+					ElementStyle="{StaticResource HeaderValueTextStyle}"
+					EditingElementStyle="{StaticResource HeaderValueEditStyle}" />
+
+				<!-- REMOVE -->
+				<DataGridTemplateColumn Width="40">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Button Content="✖"
+							        Command="{Binding RemoveCommand}"
+							        ToolTip="Remove parameter"
+							        Padding="2"
+							        Style="{StaticResource GhostButtonStyle}"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+			</DataGrid.Columns>
+		</DataGrid>
+
+	</Grid>
+</UserControl>
