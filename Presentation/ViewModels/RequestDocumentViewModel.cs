@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -22,7 +23,8 @@ public class RequestDocumentViewModel : BaseViewModel
     private readonly HistoryService _historyService;
     private readonly HttpRequestModel _request;
     private readonly IHttpExecutor _httpExecutor;
-    private HttpResponseResult? _response;
+    private HttpResponseResult _response;
+    private CancellationTokenSource _cancellationTokenSource;
 
 
     public RequestDocumentViewModel(IHttpExecutor httpExecutor, HistoryService historyService, SavedRequestService savedRequestService, HttpRequestModel request, HttpResponseResult response = null)
@@ -36,14 +38,17 @@ public class RequestDocumentViewModel : BaseViewModel
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
         AddFormItemCommand = new RelayCommand(AddFormItem);
         SaveRequestCommand = new RelayCommand(SaveRequest);
+        CancelCommand = new RelayCommand(CancelRequest);
 
         RequestHeaders = new ObservableCollection<RequestHeaderItemViewModel>(
             _request.Headers.Select(h => new RequestHeaderItemViewModel(h, RemoveHeader))
         );
         SyncDomainToBody();
-        FormItems.CollectionChanged += (s, e) => SyncBodyToDomain();
+        FormItems.CollectionChanged += (_, _) => SyncBodyToDomain();
         Auth = new RequestAuthViewModel();
         Auth.PropertyChanged += OnAuthChanged;
+
+        SendButtonText = "Send";
     }
 
     public HttpRequestModel Domain => _request;
@@ -52,6 +57,13 @@ public class RequestDocumentViewModel : BaseViewModel
 
     public ObservableCollection<string> HttpMethods { get; } =
         ["GET", "POST", "PUT", "DELETE"];
+
+    private string _sendButtonText;
+    public string SendButtonText
+    {
+        get => _sendButtonText;
+        set => SetProperty(ref _sendButtonText, value);
+    }
 
     public string Url
     {
@@ -308,64 +320,108 @@ public class RequestDocumentViewModel : BaseViewModel
     public ICommand AddHeaderCommand { get; }
     public ICommand AddFormItemCommand { get; }
     public ICommand SaveRequestCommand { get; }
+    public ICommand CancelCommand { get; }
+
+    public void CancelRequest()
+    {
+        _cancellationTokenSource?.Cancel();
+    }
 
     private async Task SendAsync()
     {
-        SyncBodyToDomain();
-        var toRemove = RequestHeaders
-            .Where(h => !h.IsSystem && !h.HasValidKey())
-            .ToList();
+        try
+        {
+            SendButtonText = "Waiting...";
 
-        foreach (var header in toRemove)
-        {
-            RemoveHeader(header);
-        }
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
 
-        _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
-        var executionResult = await _httpExecutor.ExecuteAsync(_request);
-        if (executionResult.IsSuccess)
-        {
-            _response = executionResult.Response;
+            SyncBodyToDomain();
+            var toRemove = RequestHeaders
+                .Where(h => !h.IsSystem && !h.HasValidKey())
+                .ToList();
+
+            foreach (var header in toRemove)
+            {
+                RemoveHeader(header);
+            }
+
+            _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
+            var executionResult = await _httpExecutor.ExecuteAsync(_request, _cancellationTokenSource.Token);
+
+            if (_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException();
+            }
+
+            if (executionResult.IsSuccess)
+            {
+                _response = executionResult.Response ?? throw new NullReferenceException("Execution succeeded but response is null");
+            }
+            else
+            {
+                _response = new HttpResponseResult
+                {
+                    StatusCode = 0,
+                    Body = executionResult.Error?.Message ?? "Unknown error",
+                    Headers = new List<string>(),
+                    ElapsedMilliseconds = executionResult.ElapsedMilliseconds,
+                    ResponseSize = 0
+                };
+            }
+
+            OnPropertyChanged(nameof(StatusCode));
+            OnPropertyChanged(nameof(StatusColor));
+            OnPropertyChanged(nameof(StatusText));
+            OnPropertyChanged(nameof(ResponseBody));
+            OnPropertyChanged(nameof(ElapsedMilliseconds));
+            OnPropertyChanged(nameof(ResponseHeaders));
+
+            var historyEntry = new RequestHistoryEntry
+            {
+                Method = _request.Method,
+                Url = _request.Url,
+
+                Headers = _request.Headers.Where(h => !string.IsNullOrWhiteSpace(h.Key))
+                    .Select(h => h.Copy())
+                    .ToList(),
+
+                AuthType = Auth.AuthType,
+                BearerToken = Auth.BearerToken,
+
+                ResponseBody = _response.Body ?? string.Empty,
+                ResponseHeaders = ResponseHeaders.ToList(),
+                StatusCode = _response.StatusCode,
+                DurationMs = _response.ElapsedMilliseconds,
+            };
+            historyEntry.AddMapBodyFromRequest(_request);
+
+            _historyService.Add(historyEntry);
         }
-        else
+        catch (OperationCanceledException)
         {
+            // Request was cancelled
             _response = new HttpResponseResult
             {
                 StatusCode = 0,
-                Body = executionResult.Error?.Message ?? "Unknown error",
+                Body = "Request cancelled",
                 Headers = new List<string>(),
-                ElapsedMilliseconds = executionResult.ElapsedMilliseconds,
+                ElapsedMilliseconds = 0,
                 ResponseSize = 0
             };
+
+            OnPropertyChanged(nameof(StatusCode));
+            OnPropertyChanged(nameof(StatusColor));
+            OnPropertyChanged(nameof(StatusText));
+            OnPropertyChanged(nameof(ResponseBody));
+            OnPropertyChanged(nameof(ElapsedMilliseconds));
+            OnPropertyChanged(nameof(ResponseHeaders));
         }
-
-        OnPropertyChanged(nameof(StatusCode));
-        OnPropertyChanged(nameof(StatusColor));
-        OnPropertyChanged(nameof(StatusText));
-        OnPropertyChanged(nameof(ResponseBody));
-        OnPropertyChanged(nameof(ElapsedMilliseconds));
-        OnPropertyChanged(nameof(ResponseHeaders));
-
-        var historyEntry = new RequestHistoryEntry
+        finally
         {
-            Method = _request.Method,
-            Url = _request.Url,
-
-            Headers = _request.Headers.Where(h => !string.IsNullOrWhiteSpace(h.Key))
-                .Select(h => h.Copy())
-                .ToList(),
-
-            AuthType = Auth.AuthType,
-            BearerToken = Auth.BearerToken,
-
-            ResponseBody = _response.Body ?? string.Empty,
-            ResponseHeaders = ResponseHeaders.ToList(),
-            StatusCode = _response.StatusCode,
-            DurationMs = _response.ElapsedMilliseconds,
-        };
-        historyEntry.AddMapBodyFromRequest(_request);
-
-        _historyService.Add(historyEntry);
+            SendButtonText = "Send";
+        }
     }
 
     private void UpdateSystemHeaders()
@@ -426,7 +482,7 @@ public class RequestDocumentViewModel : BaseViewModel
         return httpMethod;
     }
 
-    private void OnAuthChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnAuthChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(RequestAuthViewModel.AuthType) ||
             e.PropertyName == nameof(RequestAuthViewModel.BearerToken))
