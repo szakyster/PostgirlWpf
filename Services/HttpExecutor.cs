@@ -25,6 +25,8 @@ namespace Postgirl.Services
             {
                 using var request = BuildRequestMessage(model);
 
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+
                 using var response = await Client.SendAsync(
                     request,
                     HttpCompletionOption.ResponseHeadersRead,
