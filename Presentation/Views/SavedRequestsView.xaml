@@ -9,14 +9,31 @@
 				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<Border Padding="4">
-							<StackPanel>
-								<TextBlock Text="{Binding Name}"
-								           FontWeight="SemiBold"/>
-								<TextBlock Text="{Binding Url}"
-								           FontSize="11"
-								           Foreground="Gray"
-								           TextTrimming="CharacterEllipsis"/>
-							</StackPanel>
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<StackPanel Grid.Column="0">
+									<TextBlock Text="{Binding Name}"
+											   FontWeight="SemiBold"/>
+									<TextBlock Text="{Binding Url}"
+											   FontSize="11"
+											   Foreground="Gray"
+											   TextTrimming="CharacterEllipsis"/>
+								</StackPanel>
+
+								<Button Grid.Column="1"
+										Content="✖"
+										Command="{Binding DataContext.DeleteSavedRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+										CommandParameter="{Binding}"
+										ToolTip="Delete saved request"
+										Padding="4"
+										Margin="4,0,0,0"
+										VerticalAlignment="Center"
+										Style="{StaticResource GhostButtonStyle}"/>
+							</Grid>
 						</Border>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
