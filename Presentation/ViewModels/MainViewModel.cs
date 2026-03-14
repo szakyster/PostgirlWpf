@@ -31,6 +31,7 @@ public class MainViewModel : BaseViewModel
 
         NewTabCommand = new RelayCommand(AddNewDocument);
         CloseDocumentCommand = new RelayCommand<RequestDocumentViewModel>(CloseDocument);
+        DeleteSavedRequestCommand = new RelayCommand<SavedRequestEntry>(DeleteSavedRequest);
 
         LoadState();
 
@@ -56,6 +57,7 @@ public class MainViewModel : BaseViewModel
 
     public ICommand NewTabCommand { get; }
     public ICommand CloseDocumentCommand { get; }
+    public ICommand DeleteSavedRequestCommand { get; }
 
     private void AddNewDocument()
     {
@@ -109,5 +111,11 @@ public class MainViewModel : BaseViewModel
                 ActiveDocument = Documents[newIndex];
             }
         }
+    }
+
+    private void DeleteSavedRequest(SavedRequestEntry entry)
+    {
+        if (entry == null) return;
+        _savedRequestService.Remove(entry);
     }
 }
