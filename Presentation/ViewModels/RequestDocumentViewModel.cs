@@ -407,6 +407,10 @@ public class RequestDocumentViewModel : BaseViewModel
                     .Select(h => h.Copy())
                     .ToList(),
 
+                Parameters = _request.Parameters.Where(p => !string.IsNullOrWhiteSpace(p.Key))
+                    .Select(p => p.Copy())
+                    .ToList(),
+
                 AuthType = Auth.AuthType,
                 BearerToken = Auth.BearerToken,
 

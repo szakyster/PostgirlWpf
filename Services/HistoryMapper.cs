@@ -16,7 +16,8 @@ public static class HistoryMapper
         {
             Method = entry.Method,
             Url = entry.Url,
-            Headers = MapHeaders(entry)
+            Headers = MapHeaders(entry),
+            Parameters = entry.Parameters == null ? [] : entry.Parameters.Select(p => p.Copy()).ToList(),
         };
 
         switch (entry.BodyType)
