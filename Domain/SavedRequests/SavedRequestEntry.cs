@@ -14,6 +14,7 @@ public class SavedRequestEntry
     public string Url { get; set; } = string.Empty;
 
     public List<RequestHeader> Headers { get; set; } = new();
+    public List<RequestParameter> Parameters { get; set; } = new();
 
     public BodyType BodyType { get; set; }
     public string BodyText { get; set; } = string.Empty;

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Postgirl.Presentation.Views.RequestDocument.Parts.RequestHeadersView"
+<UserControl x:Class="Postgirl.Presentation.Views.RequestDocument.Parts.RequestParametersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	<Grid>
@@ -7,15 +7,15 @@
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 
-		<!-- ADD HEADER BUTTON -->
-		<Button Content="+ Add Header"
-		        Command="{Binding AddHeaderCommand}"
+		<!-- ADD PARAMETER BUTTON -->
+		<Button Content="+ Add Parameter"
+		        Command="{Binding AddParameterCommand}"
 		        HorizontalAlignment="Left"
 		        Margin="0,0,0,8"/>
 
-		<!-- HEADERS GRID -->
+		<!-- PARAMETERS GRID -->
 		<DataGrid Grid.Row="1"
-		          ItemsSource="{Binding RequestHeaders}"
+		          ItemsSource="{Binding RequestParameters}"
 		          AutoGenerateColumns="False"
 		          CanUserAddRows="False"
 		          VerticalScrollBarVisibility="Auto">
@@ -26,16 +26,14 @@
 				<DataGridTemplateColumn Width="40">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<CheckBox IsChecked="{Binding IsEnabled , UpdateSourceTrigger=PropertyChanged}"
-							          IsEnabled="{Binding CanEdit}" />
+							<CheckBox IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
 				<!-- KEY -->
 				<DataGridTextColumn
-					
-					Header="Header"
+					Header="Parameter"
 					Binding="{Binding Key}"
 					Width="200"
 					ElementStyle="{StaticResource HeaderValueTextStyle}"
@@ -55,8 +53,7 @@
 						<DataTemplate>
 							<Button Content="✖"
 							        Command="{Binding RemoveCommand}"
-							        IsEnabled="{Binding CanEdit}"
-							        ToolTip="Remove header"
+							        ToolTip="Remove parameter"
 							        Padding="2"
 							        Style="{StaticResource GhostButtonStyle}"/>
 						</DataTemplate>

@@ -13,6 +13,7 @@ namespace Postgirl.Domain.History
         public string Url { get; set; } = string.Empty;
 
         public List<RequestHeader> Headers { get; set; } = [];
+        public List<RequestParameter> Parameters { get; set; } = [];
 
         public BodyType BodyType { get; set; }
         public string BodyText { get; set; } = string.Empty;

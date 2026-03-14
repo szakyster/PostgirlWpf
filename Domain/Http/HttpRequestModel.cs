@@ -11,6 +11,7 @@ public class HttpRequestModel
     public string Url { get; set; } = string.Empty;
 
     public IList<RequestHeader> Headers { get; set; } =[];
+    public IList<RequestParameter> Parameters { get; set; } =[];
     public HttpBody Body { get; set; } = new TextBody();
 
     public string BearerToken { get; set; } = string.Empty;

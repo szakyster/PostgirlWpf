@@ -4,8 +4,11 @@
              xmlns:parts="clr-namespace:Postgirl.Presentation.Views.RequestDocument.Parts">
 
 	<TabControl>
+        <TabItem Header="Parameters">
+            <parts:RequestParametersView/>
+        </TabItem>
 
-		<TabItem Header="Body">
+        <TabItem Header="Body">
 			<parts:RequestBodyView/>
 		</TabItem>
 
@@ -16,6 +19,7 @@
 		<TabItem Header="Headers">
 			<parts:RequestHeadersView/>
 		</TabItem>
+
 
 	</TabControl>
 
