@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 using Postgirl.Common;
 using Postgirl.Domain.History;
@@ -22,6 +23,15 @@ public class MainViewModel : BaseViewModel
     public HistoryViewModel HistoryViewModel { get; }
     public ObservableCollection<SavedRequestEntry> SavedRequests
         => _savedRequestService.Items;
+
+    public string AppVersion
+    {
+        get
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            return $"v{version.Major}.{version.Minor}.{version.Build}-alpha";
+        }
+    }
 
     public MainViewModel(IHttpExecutor httpExecutor, HistoryService historyService, StorageService storageService, SavedRequestService savedRequestService)
     {
