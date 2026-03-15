@@ -107,20 +107,6 @@ public class RequestDocumentViewModel : BaseViewModel
         }
     }
 
-/*    public string RequestBody
-    {
-        get => _request.Body.ToString();
-        set
-        {
-            if ((_request.Body?.ToString() ?? "") == value) return;
-            var body = new TextBody
-            {
-                Content = value
-            };
-            _request.Body = body;
-        }
-    }
-*/
     private string _textBodyText = "";
     public string TextBodyText
     {
@@ -366,8 +352,7 @@ public class RequestDocumentViewModel : BaseViewModel
                 RemoveParameter(parameter);
             }
 
-            _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
-            _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
+            SyncToDomain();
             var executionResult = await _httpExecutor.ExecuteAsync(_request, _cancellationTokenSource.Token);
 
             if (_cancellationTokenSource.Token.IsCancellationRequested)
@@ -569,4 +554,9 @@ public class RequestDocumentViewModel : BaseViewModel
         _savedRequestService.Add(entry);
     }
 
+    public void SyncToDomain()
+    {
+        _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
+        _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
+    }
 }
