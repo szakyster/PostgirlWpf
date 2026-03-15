@@ -33,13 +33,15 @@ namespace Postgirl
             var storage = AppHost.Services.GetRequiredService<StorageService>();
             var history = AppHost.Services.GetRequiredService<HistoryService>();
             var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
+            var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
             try
             {
                 var state = new AppState
                 {
                     History = history.Export(),
-                    SavedRequests = saved.Export()
+                    SavedRequests = saved.Export(),
+                    OpenedDocuments = mainViewModel.ExportOpenedDocuments()
                 };
 
                 storage.SaveAsync(state);
@@ -76,10 +78,22 @@ namespace Postgirl
             var storage = AppHost.Services.GetRequiredService<StorageService>();
             var history = AppHost.Services.GetRequiredService<HistoryService>();
             var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
+            var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
             var state = await storage.LoadAsync();
             history.Import(state.History);
             saved.Import(state.SavedRequests);
+
+            // Import opened documents or add new empty document if none exist
+            if (state.OpenedDocuments != null && state.OpenedDocuments.Count > 0)
+            {
+                mainViewModel.ImportOpenedDocuments(state.OpenedDocuments);
+            }
+            else
+            {
+                // If no saved documents, create a new empty one
+                mainViewModel.NewTabCommand.Execute(null);
+            }
 
             var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
             mainWindow.Show();

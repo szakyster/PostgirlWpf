@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Postgirl.Common;
 using Postgirl.Domain.History;
 using Postgirl.Domain.Http;
+using Postgirl.Domain.Persistence;
 using Postgirl.Domain.SavedRequests;
 using Postgirl.Services;
 
@@ -34,8 +37,6 @@ public class MainViewModel : BaseViewModel
         DeleteSavedRequestCommand = new RelayCommand<SavedRequestEntry>(DeleteSavedRequest);
 
         LoadState();
-
-        AddNewDocument();
     }
 
     private async void LoadState()
@@ -98,6 +99,7 @@ public class MainViewModel : BaseViewModel
 
         var index = Documents.IndexOf(doc);
         Documents.Remove(doc);
+        doc.CancelRequest();
 
         if (ActiveDocument == doc)
         {
@@ -117,5 +119,47 @@ public class MainViewModel : BaseViewModel
     {
         if (entry == null) return;
         _savedRequestService.Remove(entry);
+    }
+
+    public void OpenDocument(OpenedDocumentEntry entry)
+    {
+        var request = OpenedDocumentMapper.ToRequestModel(entry);
+        var response = OpenedDocumentMapper.ToResponseModel(entry);
+
+        var vm = new RequestDocumentViewModel(
+            _httpExecutor,
+            _historyService,
+            _savedRequestService,
+            request,
+            response);
+
+        OpenedDocumentMapper.ApplyAuth(entry, vm.Auth);
+
+        Documents.Add(vm);
+    }
+
+    public List<OpenedDocumentEntry> ExportOpenedDocuments()
+    {
+        return Documents
+            .Select(doc => OpenedDocumentMapper.FromViewModel(doc))
+            .ToList();
+    }
+
+    public void ImportOpenedDocuments(List<OpenedDocumentEntry> entries)
+    {
+        if (entries == null || entries.Count == 0)
+            return;
+
+        Documents.Clear();
+
+        foreach (var entry in entries)
+        {
+            OpenDocument(entry);
+        }
+
+        if (Documents.Count > 0)
+        {
+            ActiveDocument = Documents[0];
+        }
     }
 }
