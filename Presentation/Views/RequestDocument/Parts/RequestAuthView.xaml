@@ -59,21 +59,33 @@ Padding="12">
 								<Setter Property="Content">
 									<Setter.Value>
 
-										<StackPanel>
+										<Grid>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="*"/>
+												<RowDefinition Height="Auto"/>
+											</Grid.RowDefinitions>
 
-											<TextBlock Text="Bearer Token"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,6"/>
+											<TextBlock Grid.Row="0"
+													   Text="Bearer Token"
+													   FontWeight="SemiBold"
+													   Margin="0,0,0,6"/>
 
-											<TextBox Text="{Binding Auth.BearerToken, UpdateSourceTrigger=PropertyChanged}"
-                                     MinWidth="300"/>
+											<TextBox Grid.Row="1"
+													 Text="{Binding Auth.BearerToken, UpdateSourceTrigger=PropertyChanged}"
+													 MinWidth="300"
+													 AcceptsReturn="True"
+													 TextWrapping="Wrap"
+													 VerticalScrollBarVisibility="Auto"
+													 VerticalContentAlignment="Top"/>
 
-											<TextBlock Text="The token will be sent in the Authorization header."
-                                       Margin="0,6,0,0"
-                                       Foreground="Gray"
-                                       FontSize="11"/>
+											<TextBlock Grid.Row="2"
+													   Text="The token will be sent in the Authorization header."
+													   Margin="0,6,0,0"
+													   Foreground="Gray"
+													   FontSize="11"/>
 
-										</StackPanel>
+										</Grid>
 									</Setter.Value>
 								</Setter>
 							</DataTrigger>
