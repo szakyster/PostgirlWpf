@@ -172,4 +172,12 @@ public class MainViewModel : BaseViewModel
             ActiveDocument = Documents[0];
         }
     }
+
+    public void CancelAllRequests()
+    {
+        foreach (var document in Documents)
+        {
+            document.CancelRequest();
+        }
+    }
 }
