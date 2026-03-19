@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Postgirl.Domain.Execution;
 using Postgirl.Domain.Http;
 
@@ -31,6 +32,12 @@ namespace Postgirl.Services
                     cancellationToken);
 
                 var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                // Format JSON if content type is application/json
+                if (IsJsonContentType(response.Content.Headers.ContentType?.MediaType))
+                {
+                    responseBody = FormatJson(responseBody);
+                }
 
                 stopwatch.Stop();
 
@@ -125,6 +132,36 @@ namespace Postgirl.Services
                 .Concat(response.Content.Headers
                     .Select(h => $"{h.Key}: {string.Join(", ", h.Value)}"))
                 .ToList();
+        }
+
+        private bool IsJsonContentType(string mediaType)
+        {
+            if (string.IsNullOrWhiteSpace(mediaType))
+                return false;
+
+            return mediaType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
+                   mediaType.Contains("text/json", StringComparison.OrdinalIgnoreCase) ||
+                   mediaType.Contains("+json", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private string FormatJson(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return json;
+
+            try
+            {
+                using var document = JsonDocument.Parse(json);
+                return JsonSerializer.Serialize(document, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+            }
+            catch
+            {
+                // If parsing fails, return original
+                return json;
+            }
         }
     }
 }
