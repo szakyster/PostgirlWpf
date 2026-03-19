@@ -134,7 +134,7 @@ namespace Postgirl.Services
                 .ToList();
         }
 
-        private bool IsJsonContentType(string mediaType)
+        private static bool IsJsonContentType(string mediaType)
         {
             if (string.IsNullOrWhiteSpace(mediaType))
                 return false;
@@ -144,7 +144,7 @@ namespace Postgirl.Services
                    mediaType.Contains("+json", StringComparison.OrdinalIgnoreCase);
         }
 
-        private string FormatJson(string json)
+        private static string FormatJson(string json)
         {
             if (string.IsNullOrWhiteSpace(json))
                 return json;
