@@ -9,4 +9,5 @@ public class AppState
     public List<RequestHistoryEntry> History { get; set; } = [];
     public List<SavedRequestEntry> SavedRequests { get; set; } = [];
     public List<OpenedDocumentEntry> OpenedDocuments { get; set; } = [];
+    public string ActiveSidebarPanel { get; set; } = "SavedExpander";
 }

@@ -11,7 +11,7 @@
 
 				<ListBox.ItemTemplate>
 					<DataTemplate>
-						<Grid Margin="4">
+						<Grid Margin="2,3">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="40"/>
 								<ColumnDefinition Width="150"/>
@@ -26,10 +26,10 @@
 
 							<!-- URL -->
 							<TextBlock Grid.Column="1"
-						           Text="{Binding Url}"
-						           TextTrimming="CharacterEllipsis"
-						           TextWrapping="Wrap"
-						           />
+									   Text="{Binding Url}"
+									   ToolTip="{Binding Url}"
+									   TextTrimming="CharacterEllipsis"
+									   />
 
 							<!-- STATUS -->
 							<TextBlock Grid.Column="2"

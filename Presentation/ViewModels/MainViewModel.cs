@@ -24,6 +24,8 @@ public class MainViewModel : BaseViewModel
     public ObservableCollection<SavedRequestEntry> SavedRequests
         => _savedRequestService.Items;
 
+    public string ActiveSidebarPanel { get; set; } = "SavedExpander";
+
     public string AppVersion
     {
         get
