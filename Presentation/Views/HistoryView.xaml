@@ -11,7 +11,7 @@
 
 				<ListBox.ItemTemplate>
 					<DataTemplate>
-						<Grid Margin="4">
+						<Grid Margin="2,3">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="40"/>
 								<ColumnDefinition Width="150"/>
