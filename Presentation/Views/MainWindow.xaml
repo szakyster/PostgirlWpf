@@ -100,43 +100,43 @@
 					<ScrollViewer VerticalScrollBarVisibility="Auto"
 								  Background="Transparent">
 
-						<StackPanel Margin="8,0,8,12">
+						<StackPanel Margin="8,0,8,6">
 
 							<!-- Saved -->
-								<Expander x:Name="SavedExpander"
-										  Header="Saved Requests"
-										  IsExpanded="True"
-										  Expanded="Expander_Expanded"
-										  Margin="0,0,0,12">
+							<Expander x:Name="SavedExpander"
+									  Header="Saved Requests"
+									  IsExpanded="True"
+									  Expanded="Expander_Expanded"
+									  Margin="0,0,0,6">
 
-									<views:SavedRequestsView/>
+								<views:SavedRequestsView/>
 
-								</Expander>
+							</Expander>
 
-								<!-- History -->
-								<Expander x:Name="HistoryExpander"
-										  Header="History"
-										  IsExpanded="False"
-										  Expanded="Expander_Expanded"
-										  Margin="0,0,0,12">
+							<!-- History -->
+							<Expander x:Name="HistoryExpander"
+									  Header="History"
+									  IsExpanded="False"
+									  Expanded="Expander_Expanded"
+									  Margin="0,0,0,6">
 
-									<views:HistoryView DataContext="{Binding HistoryViewModel}"/>
+								<views:HistoryView DataContext="{Binding HistoryViewModel}"/>
 
-								</Expander>
+							</Expander>
 
-								<!-- Variables -->
-								<Expander x:Name="VariablesExpander"
-										  Header="Variables"
-										  IsExpanded="False"
-										  Expanded="Expander_Expanded">
+							<!-- Variables -->
+							<Expander x:Name="VariablesExpander"
+									  Header="Variables"
+									  IsExpanded="False"
+									  Expanded="Expander_Expanded">
 
-									<TextBlock Text="Variable support is coming soon."
-											   Foreground="Gray"
-											   FontStyle="Italic"
-											   Margin="4,4,0,0"
-											   TextWrapping="Wrap"/>
+								<TextBlock Text="Variable support is coming soon."
+										   Foreground="Gray"
+										   FontStyle="Italic"
+										   Margin="4,4,0,0"
+										   TextWrapping="Wrap"/>
 
-								</Expander>
+							</Expander>
 
 						</StackPanel>
 
