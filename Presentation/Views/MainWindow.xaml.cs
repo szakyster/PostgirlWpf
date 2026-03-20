@@ -14,8 +14,19 @@ namespace Postgirl.Presentation.Views
             InitializeComponent(); 
             DataContext = vm;
             Closing += OnClosing;
+            Loaded += OnLoaded;
 
-            _sidebarExpanders = [SavedExpander, HistoryExpander];
+            _sidebarExpanders = [SavedExpander, HistoryExpander, VariablesExpander];
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not MainViewModel vm) return;
+
+            foreach (var expander in _sidebarExpanders)
+            {
+                expander.IsExpanded = expander.Name == vm.ActiveSidebarPanel;
+            }
         }
 
         private void Expander_Expanded(object sender, RoutedEventArgs e)
@@ -28,6 +39,9 @@ namespace Postgirl.Presentation.Views
                 if (expander != expanded)
                     expander.IsExpanded = false;
             }
+
+            if (DataContext is MainViewModel vm)
+                vm.ActiveSidebarPanel = expanded.Name;
         }
 
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)

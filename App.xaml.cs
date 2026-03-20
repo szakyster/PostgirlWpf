@@ -41,7 +41,8 @@ namespace Postgirl
                 {
                     History = history.Export(),
                     SavedRequests = saved.Export(),
-                    OpenedDocuments = mainViewModel.ExportOpenedDocuments()
+                    OpenedDocuments = mainViewModel.ExportOpenedDocuments(),
+                    ActiveSidebarPanel = mainViewModel.ActiveSidebarPanel
                 };
 
                 storage.SaveAsync(state);
@@ -88,12 +89,14 @@ namespace Postgirl
             if (state.OpenedDocuments != null && state.OpenedDocuments.Count > 0)
             {
                 mainViewModel.ImportOpenedDocuments(state.OpenedDocuments);
-            }
-            else
-            {
-                // If no saved documents, create a new empty one
-                mainViewModel.NewTabCommand.Execute(null);
-            }
+                }
+                else
+                {
+                    // If no saved documents, create a new empty one
+                    mainViewModel.NewTabCommand.Execute(null);
+                }
+
+                mainViewModel.ActiveSidebarPanel = state.ActiveSidebarPanel;
 
             var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
             mainWindow.Show();

@@ -117,11 +117,26 @@
 								<Expander x:Name="HistoryExpander"
 										  Header="History"
 										  IsExpanded="False"
+										  Expanded="Expander_Expanded"
+										  Margin="0,0,0,12">
+
+									<views:HistoryView DataContext="{Binding HistoryViewModel}"/>
+
+								</Expander>
+
+								<!-- Variables -->
+								<Expander x:Name="VariablesExpander"
+										  Header="Variables"
+										  IsExpanded="False"
 										  Expanded="Expander_Expanded">
 
-								<views:HistoryView DataContext="{Binding HistoryViewModel}"/>
+									<TextBlock Text="Variable support is coming soon."
+											   Foreground="Gray"
+											   FontStyle="Italic"
+											   Margin="4,4,0,0"
+											   TextWrapping="Wrap"/>
 
-							</Expander>
+								</Expander>
 
 						</StackPanel>
 
