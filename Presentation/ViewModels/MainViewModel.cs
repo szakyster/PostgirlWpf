@@ -32,7 +32,7 @@ public class MainViewModel : BaseViewModel
         get
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            return $"v{version.Major}.{version.Minor}.{version.Build}-alpha";
+            return version == null ? "v?.?.?-alpha" : $"v{version.Major}.{version.Minor}.{version.Build}-alpha";
         }
     }
 
