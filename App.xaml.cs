@@ -11,20 +11,29 @@ using Postgirl.Services;
 
 namespace Postgirl
 {
-    public partial class App : Application
+    public partial class App
     {
 
         public static IHost AppHost { get; private set; } = null!;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            AppHost = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) => { ConfigureServices(services); })
-                .Build();
+            try
+            {
+                AppHost = Host.CreateDefaultBuilder()
+                    .ConfigureServices((context, services) => { ConfigureServices(services); })
+                    .Build();
 
-            await AppHost.StartAsync();
-            await InitializeApplicationAsync();
-            base.OnStartup(e);
+                await AppHost.StartAsync();
+                await InitializeApplicationAsync();
+                base.OnStartup(e);
+            }
+            catch (Exception)
+            {
+                    // If initialization fails, we still want to show the main window so the user can see the error message
+                    var mainWindow = new MainWindow(null);
+                    mainWindow.Show();
+            }
         }
 
         protected override async void OnExit(ExitEventArgs e)
@@ -61,7 +70,7 @@ namespace Postgirl
             }
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceCollection services)
         {
             //services
             services.AddSingleton<IHttpExecutor, HttpExecutor>();

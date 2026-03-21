@@ -125,18 +125,14 @@
 							</Expander>
 
 							<!-- Variables -->
-							<Expander x:Name="VariablesExpander"
-									  Header="Variables"
-									  IsExpanded="False"
-									  Expanded="Expander_Expanded">
+								<Expander x:Name="VariablesExpander"
+										  Header="Variables"
+										  IsExpanded="False"
+										  Expanded="Expander_Expanded">
 
-								<TextBlock Text="Variable support is coming soon."
-										   Foreground="Gray"
-										   FontStyle="Italic"
-										   Margin="4,4,0,0"
-										   TextWrapping="Wrap"/>
+									<views:VariablesView DataContext="{Binding VariablesViewModel}"/>
 
-							</Expander>
+								</Expander>
 
 						</StackPanel>
 
