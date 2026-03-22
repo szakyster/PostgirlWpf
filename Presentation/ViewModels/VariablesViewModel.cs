@@ -10,14 +10,29 @@ public class VariablesViewModel : BaseViewModel
 {
     private readonly VariablesService _variablesService;
 
+    public ObservableCollection<VariableItemViewModel> Items { get; } = new();
+
     public VariablesViewModel(VariablesService variablesService)
     {
         _variablesService = variablesService;
-        AddCommand = new RelayCommand(() => _variablesService.Add(new VariableEntry()));
-        DeleteCommand = new RelayCommand<VariableEntry>(entry => { if (entry != null) _variablesService.Remove(entry); });
-    }
 
-    public ObservableCollection<VariableEntry> Items => _variablesService.Items;
+        foreach (var entry in variablesService.Items)
+            Items.Add(new VariableItemViewModel(entry));
+
+        AddCommand = new RelayCommand(() =>
+        {
+            var entry = new VariableEntry("variable");
+            _variablesService.Add(entry);
+            Items.Add(new VariableItemViewModel(entry));
+        });
+
+        DeleteCommand = new RelayCommand<VariableItemViewModel>(vm =>
+        {
+            if (vm == null) return;
+            _variablesService.Remove(vm.Entry);
+            Items.Remove(vm);
+        });
+    }
 
     public ICommand AddCommand { get; }
     public ICommand DeleteCommand { get; }
