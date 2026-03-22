@@ -7,6 +7,7 @@ public class VariableItemViewModel : BaseViewModel
 {
     private string _key;
     private string _value;
+    private bool _isDuplicate;
 
     public VariableItemViewModel(VariableEntry entry)
     {
@@ -42,5 +43,11 @@ public class VariableItemViewModel : BaseViewModel
             if (SetProperty(ref _value, value ?? string.Empty))
                 Entry.Value = _value;
         }
+    }
+
+    public bool IsDuplicate
+    {
+        get => _isDuplicate;
+        set => SetProperty(ref _isDuplicate, value);
     }
 }
