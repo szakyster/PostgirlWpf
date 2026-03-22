@@ -19,8 +19,9 @@ public class MainViewModel : BaseViewModel
     private readonly HistoryService _historyService;
     private readonly StorageService _storageService;
     private readonly SavedRequestService _savedRequestService;
-    
+
     public HistoryViewModel HistoryViewModel { get; }
+    public VariablesViewModel VariablesViewModel { get; }
     public ObservableCollection<SavedRequestEntry> SavedRequests
         => _savedRequestService.Items;
 
@@ -31,11 +32,11 @@ public class MainViewModel : BaseViewModel
         get
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            return $"v{version.Major}.{version.Minor}.{version.Build}-alpha";
+            return version == null ? "v?.?.?-alpha" : $"v{version.Major}.{version.Minor}.{version.Build}-alpha";
         }
     }
 
-    public MainViewModel(IHttpExecutor httpExecutor, HistoryService historyService, StorageService storageService, SavedRequestService savedRequestService)
+    public MainViewModel(IHttpExecutor httpExecutor, HistoryService historyService, StorageService storageService, SavedRequestService savedRequestService, VariablesService variablesService)
     {
         _storageService = storageService;
         _savedRequestService = savedRequestService;
@@ -43,6 +44,7 @@ public class MainViewModel : BaseViewModel
         _historyService = historyService;
 
         HistoryViewModel = new HistoryViewModel(historyService, this);
+        VariablesViewModel = new VariablesViewModel(variablesService);
 
         NewTabCommand = new RelayCommand(AddNewDocument);
         CloseDocumentCommand = new RelayCommand<RequestDocumentViewModel>(CloseDocument);

@@ -1,0 +1,56 @@
+<UserControl x:Class="Postgirl.Presentation.Views.VariablesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Border Padding="4,2">
+		<DockPanel>
+
+			<Button DockPanel.Dock="Bottom"
+			        Content="+ Add variable"
+			        Command="{Binding AddCommand}"
+			        Style="{StaticResource GhostButtonStyle}"
+			        HorizontalAlignment="Left"
+			        Margin="0,4,0,0"/>
+
+			<DataGrid ItemsSource="{Binding Items}"
+			          AutoGenerateColumns="False"
+			          CanUserAddRows="False"
+			          CanUserDeleteRows="False"
+			          CanUserResizeRows="False"
+			          CanUserResizeColumns="False"
+			          CanUserSortColumns="False"
+			          HeadersVisibility="Column"
+			          SelectionMode="Single">
+
+				<DataGrid.Columns>
+
+					<DataGridTextColumn Header="Key"
+					                    Binding="{Binding Key}"
+					                    Width="*"/>
+
+					<DataGridTextColumn Header="Value"
+					                    Binding="{Binding Value}"
+					                    Width="*"/>
+
+					<DataGridTemplateColumn Width="28">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<Button Content="✖"
+								        Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+								        CommandParameter="{Binding}"
+								        ToolTip="Delete variable"
+								        Padding="2"
+								        VerticalAlignment="Center"
+								        Style="{StaticResource GhostButtonStyle}"/>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+
+				</DataGrid.Columns>
+
+			</DataGrid>
+
+		</DockPanel>
+	</Border>
+
+</UserControl>
