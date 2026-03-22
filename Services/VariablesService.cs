@@ -7,7 +7,7 @@ namespace Postgirl.Services;
 
 public class VariablesService
 {
-    public ObservableCollection<VariableEntry> Items { get; } = new();
+    public ObservableCollection<VariableEntry> Items { get; } = [];
 
     public void Add(VariableEntry entry) => Items.Add(entry);
 
@@ -19,6 +19,8 @@ public class VariablesService
     {
         Items.Clear();
         foreach (var e in entries.Where(e => VariableKeyValidator.IsValid(e.Key)))
+        {
             Items.Add(e);
+        }
     }
 }
