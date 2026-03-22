@@ -25,12 +25,48 @@
 				<DataGrid.Columns>
 
 					<DataGridTextColumn Header="Key"
-					                    Binding="{Binding Key}"
-					                    Width="*"/>
+										Binding="{Binding Key}"
+										Width="*"/>
 
-					<DataGridTextColumn Header="Value"
-					                    Binding="{Binding Value}"
-					                    Width="*"/>
+					<DataGridTemplateColumn Header="Value" Width="*">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<DockPanel>
+									<Button DockPanel.Dock="Right"
+											Content="⤢"
+											Width="22"
+											Padding="1"
+											VerticalAlignment="Stretch"
+											Focusable="False"
+											ToolTip="Open in editor"
+											Style="{StaticResource GhostButtonStyle}"
+											Click="OnOpenEditorClick"/>
+									<TextBlock Text="{Binding Value}"
+											   VerticalAlignment="Center"
+											   TextTrimming="CharacterEllipsis"/>
+								</DockPanel>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+						<DataGridTemplateColumn.CellEditingTemplate>
+							<DataTemplate>
+								<DockPanel>
+									<Button DockPanel.Dock="Right"
+											Content="⤢"
+											Width="22"
+											Padding="1"
+											VerticalAlignment="Stretch"
+											Focusable="False"
+											ToolTip="Open in editor"
+											Style="{StaticResource GhostButtonStyle}"
+											Click="OnOpenEditorClick"/>
+									<TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+											 BorderThickness="0"
+											 Background="Transparent"
+											 VerticalAlignment="Center"/>
+								</DockPanel>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellEditingTemplate>
+					</DataGridTemplateColumn>
 
 					<DataGridTemplateColumn Width="28">
 						<DataGridTemplateColumn.CellTemplate>
