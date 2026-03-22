@@ -92,7 +92,6 @@ namespace Postgirl
             var history = AppHost.Services.GetRequiredService<HistoryService>();
             var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
             var variables = AppHost.Services.GetRequiredService<VariablesService>();
-            var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
             var state = await storage.LoadAsync();
 
@@ -119,6 +118,9 @@ namespace Postgirl
                 foreach (var v in testVariables)
                     variables.Add(v);
             }
+
+            // mainViewModel resolved AFTER all imports so VariablesViewModel initializes from populated service
+            var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
             // Import opened documents or add new empty document if none exist
             if (state.OpenedDocuments != null && state.OpenedDocuments.Count > 0)
