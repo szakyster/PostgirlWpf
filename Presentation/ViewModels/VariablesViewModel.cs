@@ -12,16 +12,14 @@ namespace Postgirl.Presentation.ViewModels;
 
 public class VariablesViewModel : BaseViewModel
 {
-    private readonly VariablesService _variablesService;
-
     public ObservableCollection<VariableItemViewModel> Items { get; } = new();
 
     public VariablesViewModel(VariablesService variablesService)
     {
-        _variablesService = variablesService;
-
         foreach (var entry in variablesService.Items)
+        {
             AddItem(new VariableItemViewModel(entry));
+        }
 
         Items.CollectionChanged += OnItemsCollectionChanged;
         RefreshDuplicates();
@@ -29,14 +27,14 @@ public class VariablesViewModel : BaseViewModel
         AddCommand = new RelayCommand(() =>
         {
             var entry = new VariableEntry("variable");
-            _variablesService.Add(entry);
+            variablesService.Add(entry);
             Items.Add(new VariableItemViewModel(entry));
         });
 
         DeleteCommand = new RelayCommand<VariableItemViewModel>(vm =>
         {
             if (vm == null) return;
-            _variablesService.Remove(vm.Entry);
+            variablesService.Remove(vm.Entry);
             Items.Remove(vm);
         });
     }
@@ -53,12 +51,21 @@ public class VariablesViewModel : BaseViewModel
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
+        {
             foreach (VariableItemViewModel vm in e.NewItems)
+            {
                 vm.PropertyChanged += OnItemPropertyChanged;
+            }
+        }
 
         if (e.OldItems != null)
+        {
             foreach (VariableItemViewModel vm in e.OldItems)
+            {
                 vm.PropertyChanged -= OnItemPropertyChanged;
+
+            }
+        }
 
         RefreshDuplicates();
     }
@@ -66,7 +73,9 @@ public class VariablesViewModel : BaseViewModel
     private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(VariableItemViewModel.Key))
+        {
             RefreshDuplicates();
+        }
     }
 
     private void RefreshDuplicates()
@@ -79,6 +88,8 @@ public class VariablesViewModel : BaseViewModel
             .ToHashSet(StringComparer.Ordinal);
 
         foreach (var vm in Items)
+        {
             vm.IsDuplicate = duplicateKeys.Contains(vm.Key);
+        }
     }
 }
