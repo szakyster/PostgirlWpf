@@ -13,14 +13,24 @@
 			        Margin="0,4,0,0"/>
 
 			<DataGrid ItemsSource="{Binding Items}"
-			          AutoGenerateColumns="False"
-			          CanUserAddRows="False"
-			          CanUserDeleteRows="False"
-			          CanUserResizeRows="False"
-			          CanUserResizeColumns="False"
-			          CanUserSortColumns="False"
-			          HeadersVisibility="Column"
-			          SelectionMode="Single">
+					  AutoGenerateColumns="False"
+					  CanUserAddRows="False"
+					  CanUserDeleteRows="False"
+					  CanUserResizeRows="False"
+					  CanUserResizeColumns="False"
+					  CanUserSortColumns="False"
+					  HeadersVisibility="Column"
+					  SelectionMode="Single">
+
+				<DataGrid.RowStyle>
+					<Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding IsDuplicate}" Value="True">
+								<Setter Property="Background" Value="#33F5B041"/>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</DataGrid.RowStyle>
 
 				<DataGrid.Columns>
 
