@@ -36,9 +36,9 @@
                             SnapsToDevicePixels="True">
 
 						<ContentPresenter
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Margin="2"/>
+							HorizontalAlignment="Center"
+							VerticalAlignment="Center"
+							Margin="{TemplateBinding Padding}"/>
 					</Border>
 
 					<ControlTemplate.Triggers>
@@ -110,30 +110,31 @@
 
 						<ContentPresenter
 							HorizontalAlignment="Center"
-							VerticalAlignment="Center"/>
+							VerticalAlignment="Center"
+							Margin="{TemplateBinding Padding}"/>
 					</Border>
 
 					<ControlTemplate.Triggers>
 
 						<Trigger Property="IsMouseOver"
-						         Value="True">
+								 Value="True">
 							<Setter TargetName="Border"
-							        Property="Background"
-							        Value="{StaticResource Brush.Surface}" />
+									Property="Background"
+									Value="{StaticResource Brush.Surface}" />
 						</Trigger>
 
 						<Trigger Property="IsPressed"
-						         Value="True">
+								 Value="True">
 							<Setter TargetName="Border"
-							        Property="Background"
-							        Value="{StaticResource Brush.SurfaceElevated}" />
+									Property="Background"
+									Value="{StaticResource Brush.SurfaceElevated}" />
 						</Trigger>
 
 						<Trigger Property="IsEnabled"
-						         Value="False">
+								 Value="False">
 							<Setter TargetName="Border"
-							        Property="Opacity"
-							        Value="0.5"/>
+									Property="Opacity"
+									Value="0.5"/>
 						</Trigger>
 
 					</ControlTemplate.Triggers>
@@ -163,34 +164,35 @@
 					        Background="Transparent"
 					        CornerRadius="4">
 
-						<ContentPresenter
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"/>
-					</Border>
+											<ContentPresenter
+												HorizontalAlignment="Center"
+												VerticalAlignment="Center"
+												Margin="{TemplateBinding Padding}"/>
+										</Border>
 
-					<ControlTemplate.Triggers>
+										<ControlTemplate.Triggers>
 
-						<Trigger Property="IsMouseOver"
-						         Value="True">
-							<Setter TargetName="Border"
-							        Property="Background"
-							        Value="{StaticResource Brush.Surface}" />
-						</Trigger>
+											<Trigger Property="IsMouseOver"
+													 Value="True">
+												<Setter TargetName="Border"
+														Property="Background"
+														Value="{StaticResource Brush.Surface}" />
+											</Trigger>
 
-						<Trigger Property="IsPressed"
-						         Value="True">
-							<Setter TargetName="Border"
-							        Property="Background"
-							        Value="{StaticResource Brush.SurfaceElevated}" />
-						</Trigger>
+											<Trigger Property="IsPressed"
+													 Value="True">
+												<Setter TargetName="Border"
+														Property="Background"
+														Value="{StaticResource Brush.SurfaceElevated}" />
+											</Trigger>
 
-					</ControlTemplate.Triggers>
+										</ControlTemplate.Triggers>
 
-				</ControlTemplate>
-			</Setter.Value>
-		</Setter>
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
 
-	</Style>
+						</Style>
 
 
 
