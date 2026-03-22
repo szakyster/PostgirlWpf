@@ -18,7 +18,7 @@ public class VariablesService
     public void Import(IEnumerable<VariableEntry> entries)
     {
         Items.Clear();
-        foreach (var e in entries)
+        foreach (var e in entries.Where(e => VariableKeyValidator.IsValid(e.Key)))
             Items.Add(e);
     }
 }
