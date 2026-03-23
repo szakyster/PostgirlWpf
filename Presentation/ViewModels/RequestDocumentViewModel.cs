@@ -329,16 +329,16 @@ public class RequestDocumentViewModel : BaseViewModel
 
     private void SaveResponseFile()
     {
-        if (_response?.FileBytes == null) return;
+        if (_response?.File?.Bytes == null) return;
 
         var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            FileName = _response.FileName ?? "download",
+            FileName = _response.File.FileName ?? "download",
             Filter = "All files (*.*)|*.*"
         };
 
         if (dialog.ShowDialog() == true)
-            System.IO.File.WriteAllBytes(dialog.FileName, _response.FileBytes);
+            System.IO.File.WriteAllBytes(dialog.FileName, _response.File.Bytes);
     }
 
     private async Task SendAsync()

@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 
 namespace Postgirl.Domain.Http
@@ -11,8 +12,8 @@ namespace Postgirl.Domain.Http
         public long ElapsedMilliseconds { get; set; }
         public long ResponseSize { get; set; }
 
-        public bool IsFile { get; set; }
-        public byte[] FileBytes { get; set; }
-        public string FileName { get; set; }
+        #nullable enable
+        public ResponseFile? File { get; set; }
+        public bool IsFile => File != null;
     }
 }

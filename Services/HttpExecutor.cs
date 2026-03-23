@@ -47,9 +47,7 @@ namespace Postgirl.Services
                             StatusCode = (int)response.StatusCode,
                             Headers = ExtractHeaders(response),
                             Body = $"[File: {fileName} — {fileBytes.Length:N0} bytes]",
-                            IsFile = true,
-                            FileBytes = fileBytes,
-                            FileName = fileName,
+                            File = new ResponseFile { FileName = fileName, Bytes = fileBytes },
                             ResponseSize = fileBytes.Length,
                             ElapsedMilliseconds = stopwatch.ElapsedMilliseconds
                         }
