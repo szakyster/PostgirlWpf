@@ -20,7 +20,7 @@ namespace Postgirl.Services
             HttpRequestModel model,
             CancellationToken cancellationToken = default)
         {
-            var stopwatch = Stopwatch.StartNew();
+                var stopwatch = Stopwatch.StartNew();
 
             try
             {
@@ -31,6 +31,29 @@ namespace Postgirl.Services
                     HttpCompletionOption.ResponseHeadersRead,
                     cancellationToken);
 
+                stopwatch.Stop();
+
+                if (IsFileResponse(response))
+                {
+                    var fileBytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+                    var fileName = ExtractFileName(response);
+
+                    return new HttpExecutionResult
+                    {
+                        IsSuccess = true,
+                        ElapsedMilliseconds = stopwatch.ElapsedMilliseconds,
+                        Response = new HttpResponseResult
+                        {
+                            StatusCode = (int)response.StatusCode,
+                            Headers = ExtractHeaders(response),
+                            Body = $"[File: {fileName} — {fileBytes.Length:N0} bytes]",
+                            File = new ResponseFile { FileName = fileName, Bytes = fileBytes },
+                            ResponseSize = fileBytes.Length,
+                            ElapsedMilliseconds = stopwatch.ElapsedMilliseconds
+                        }
+                    };
+                }
+
                 var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
                 // Format JSON if content type is application/json
@@ -38,8 +61,6 @@ namespace Postgirl.Services
                 {
                     responseBody = FormatJson(responseBody);
                 }
-
-                stopwatch.Stop();
 
                 return new HttpExecutionResult
                 {
@@ -132,6 +153,34 @@ namespace Postgirl.Services
                 .Concat(response.Content.Headers
                     .Select(h => $"{h.Key}: {string.Join(", ", h.Value)}"))
                 .ToList();
+        }
+
+        private static bool IsFileResponse(HttpResponseMessage response)
+        {
+            if (response.Content.Headers.ContentDisposition?.DispositionType
+                    ?.Equals("attachment", StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            var mediaType = response.Content.Headers.ContentType?.MediaType ?? string.Empty;
+
+            if (string.IsNullOrEmpty(mediaType)) return false;
+            if (mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase)) return false;
+            if (IsJsonContentType(mediaType)) return false;
+            if (mediaType.Contains("xml", StringComparison.OrdinalIgnoreCase)) return false;
+
+            return true;
+        }
+
+        private static string ExtractFileName(HttpResponseMessage response)
+        {
+            var name = response.Content.Headers.ContentDisposition?.FileNameStar
+                       ?? response.Content.Headers.ContentDisposition?.FileName;
+
+            if (!string.IsNullOrWhiteSpace(name))
+                return name.Trim('"');
+
+            var ext = response.Content.Headers.ContentType?.MediaType?.Split('/').LastOrDefault() ?? "bin";
+            return $"download.{ext}";
         }
 
         private static bool IsJsonContentType(string mediaType)

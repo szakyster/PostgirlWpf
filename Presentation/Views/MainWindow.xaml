@@ -150,9 +150,9 @@
                                   RelativeSource={RelativeSource AncestorType=Window}}"
 						        CommandParameter="{Binding}" />
 
-							<TextBlock Text="{Binding Title}"
-						           VerticalAlignment="Center"
-						           Margin="0,0,5,0" />
+							<TextBlock Text="{Binding Title, Converter={StaticResource StringTruncateConverter}, ConverterParameter=30}"
+								   VerticalAlignment="Center"
+								   Margin="0,0,5,0" />
 
 						</DockPanel>
 					</DataTemplate>
