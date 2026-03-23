@@ -40,6 +40,7 @@ public class RequestDocumentViewModel : BaseViewModel
         AddFormItemCommand = new RelayCommand(AddFormItem);
         SaveRequestCommand = new RelayCommand(SaveRequest);
         CancelCommand = new RelayCommand(CancelRequest);
+        SaveFileCommand = new RelayCommand(SaveResponseFile);
 
         RequestHeaders = new ObservableCollection<RequestHeaderItemViewModel>(
             _request.Headers.Select(h => new RequestHeaderItemViewModel(h, RemoveHeader))
@@ -267,6 +268,8 @@ public class RequestDocumentViewModel : BaseViewModel
         }
     }
 
+    public bool IsFileResponse => _response?.IsFile ?? false;
+
     public IReadOnlyList<string> ResponseHeaders => _response?.Headers ?? new List<string>();
 
     public int StatusCode => _response?.StatusCode ?? 0;
@@ -317,10 +320,25 @@ public class RequestDocumentViewModel : BaseViewModel
     public ICommand AddFormItemCommand { get; }
     public ICommand SaveRequestCommand { get; }
     public ICommand CancelCommand { get; }
+    public ICommand SaveFileCommand { get; }
 
     public void CancelRequest()
     {
         _cancellationTokenSource?.Cancel();
+    }
+
+    private void SaveResponseFile()
+    {
+        if (_response?.FileBytes == null) return;
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            FileName = _response.FileName ?? "download",
+            Filter = "All files (*.*)|*.*"
+        };
+
+        if (dialog.ShowDialog() == true)
+            System.IO.File.WriteAllBytes(dialog.FileName, _response.FileBytes);
     }
 
     private async Task SendAsync()
@@ -380,6 +398,7 @@ public class RequestDocumentViewModel : BaseViewModel
             OnPropertyChanged(nameof(StatusColor));
             OnPropertyChanged(nameof(StatusText));
             OnPropertyChanged(nameof(ResponseBody));
+            OnPropertyChanged(nameof(IsFileResponse));
             OnPropertyChanged(nameof(ElapsedMilliseconds));
             OnPropertyChanged(nameof(ResponseHeaders));
 

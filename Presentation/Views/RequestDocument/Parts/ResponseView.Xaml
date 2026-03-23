@@ -9,12 +9,34 @@
 		<Label Content="Response:"/>
 		<TabControl Grid.Row="1">
 			<TabItem Header="Body">
-				<TextBox Text="{Binding ResponseBody}"
-				         Background="Black"
-				         Foreground="LightGreen"
-				         FontFamily="Consolas"
-				         AcceptsReturn="True"
-				         IsReadOnly="True"/>
+				<DockPanel>
+
+					<Button DockPanel.Dock="Top"
+							Content="Save"
+							Command="{Binding SaveFileCommand}"
+							HorizontalAlignment="Left"
+							Margin="0,0,0,8"
+							Padding="16,6">
+							<Button.Style>
+								<Style TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+									<Setter Property="Visibility" Value="Collapsed"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding IsFileResponse}" Value="True">
+											<Setter Property="Visibility" Value="Visible"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Button.Style>
+						</Button>
+
+					<TextBox Text="{Binding ResponseBody}"
+							 Background="Black"
+							 Foreground="LightGreen"
+							 FontFamily="Consolas"
+							 AcceptsReturn="True"
+							 IsReadOnly="True"/>
+
+				</DockPanel>
 			</TabItem>
 			<TabItem Header="Headers">
 				<ListBox ItemsSource="{Binding ResponseHeaders}"

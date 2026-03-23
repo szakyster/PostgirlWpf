@@ -10,5 +10,9 @@ namespace Postgirl.Domain.Http
 
         public long ElapsedMilliseconds { get; set; }
         public long ResponseSize { get; set; }
+
+        public bool IsFile { get; set; }
+        public byte[] FileBytes { get; set; }
+        public string FileName { get; set; }
     }
 }
