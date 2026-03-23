@@ -150,7 +150,7 @@
                                   RelativeSource={RelativeSource AncestorType=Window}}"
 						        CommandParameter="{Binding}" />
 
-							<TextBlock Text="{Binding Title}"
+							<TextBlock Text="{Binding Title, Converter={StaticResource StringTruncateConverter}, ConverterParameter=30}"
 								   VerticalAlignment="Center"
 								   Margin="0,0,5,0" />
 
