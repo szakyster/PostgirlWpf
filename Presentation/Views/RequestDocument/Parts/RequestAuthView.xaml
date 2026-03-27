@@ -75,7 +75,7 @@ Padding="12">
 											<controls:VariableAwareTextBox
 													Grid.Row="1"
 													Text="{Binding Auth.BearerToken, UpdateSourceTrigger=PropertyChanged}"
-													AcceptsReturn="True"
+													AcceptsReturn="False"
 													MinWidth="300"
 													VariableBrushSelector="{Binding VariableBrushSelector}" />
 
