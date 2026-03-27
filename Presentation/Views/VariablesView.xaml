@@ -5,12 +5,12 @@
 	<Border Padding="4,2">
 		<DockPanel>
 
-			<Button DockPanel.Dock="Bottom"
-			        Content="+ Add variable"
-			        Command="{Binding AddCommand}"
-			        Style="{StaticResource GhostButtonStyle}"
-			        HorizontalAlignment="Left"
-			        Margin="0,4,0,0"/>
+			<Button DockPanel.Dock="Top"
+					Content="+ Add variable"
+					Command="{Binding AddCommand}"
+					Style="{StaticResource GhostButtonStyle}"
+					HorizontalAlignment="Center"
+					Margin="0,0,0,4"/>
 
 			<DataGrid ItemsSource="{Binding Items}"
 					  AutoGenerateColumns="False"
