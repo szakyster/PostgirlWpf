@@ -14,7 +14,7 @@ public class VariableAwareTextBox : Control
     private const string PartEditor = "PART_Editor";
 
     private static readonly Regex VariablePattern =
-        new(@"\{\{([^}]+)\}\}", RegexOptions.Compiled);
+        new(@"\{\{([\w\-\.]+)\}\}", RegexOptions.Compiled);
 
     private const double SingleLinePageWidth = 100_000;
 
