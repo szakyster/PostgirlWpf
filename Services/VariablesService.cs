@@ -13,6 +13,8 @@ public class VariablesService
 
     public void Remove(VariableEntry entry) => Items.Remove(entry);
 
+    public bool VariableExists(string key) => Items.Any(e => e.Key == key);
+
     public List<VariableEntry> Export() => Items.ToList();
 
     public void Import(IEnumerable<VariableEntry> entries)

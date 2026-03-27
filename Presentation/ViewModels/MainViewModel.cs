@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -19,6 +19,7 @@ public class MainViewModel : BaseViewModel
     private readonly HistoryService _historyService;
     private readonly StorageService _storageService;
     private readonly SavedRequestService _savedRequestService;
+    private readonly VariablesService _variablesService;
 
     public HistoryViewModel HistoryViewModel { get; }
     public VariablesViewModel VariablesViewModel { get; }
@@ -40,6 +41,7 @@ public class MainViewModel : BaseViewModel
     {
         _storageService = storageService;
         _savedRequestService = savedRequestService;
+        _variablesService = variablesService;
         _httpExecutor = httpExecutor;
         _historyService = historyService;
 
@@ -74,20 +76,19 @@ public class MainViewModel : BaseViewModel
     public ICommand CloseDocumentCommand { get; }
     public ICommand DeleteSavedRequestCommand { get; }
 
+    private RequestDocumentViewModel CreateDocument(HttpRequestModel request, HttpResponseResult response = null)
+        => new RequestDocumentViewModel(_httpExecutor, _historyService, _savedRequestService, _variablesService, request, response);
+
     private void AddNewDocument()
     {
-        var domainModel = new HttpRequestModel();
-        var doc = new RequestDocumentViewModel(_httpExecutor, _historyService, _savedRequestService, domainModel);
+        var doc = CreateDocument(new HttpRequestModel());
         Documents.Add(doc);
         ActiveDocument = doc;
     }
 
     public void OpenHistoryEntry(RequestHistoryEntry entry)
     {
-        var request = entry.ToHttpRequestModel();
-        var vm = new RequestDocumentViewModel(
-            _httpExecutor,
-            _historyService, _savedRequestService, request, entry.ToHttpResponseModel());
+        var vm = CreateDocument(entry.ToHttpRequestModel(), entry.ToHttpResponseModel());
         HistoryMapper.ApplyAuth(entry, vm.Auth);
 
         Documents.Add(vm);
@@ -96,11 +97,7 @@ public class MainViewModel : BaseViewModel
 
     public void OpenSaved(SavedRequestEntry entry)
     {
-        var request = SavedRequestMapper.ToRequestModel(entry);
-
-        var vm = new RequestDocumentViewModel(
-            _httpExecutor, _historyService, _savedRequestService,
-            request);
+        var vm = CreateDocument(SavedRequestMapper.ToRequestModel(entry));
         SavedRequestMapper.ApplyAuth(entry, vm.Auth);
 
         Documents.Add(vm);
@@ -137,15 +134,9 @@ public class MainViewModel : BaseViewModel
 
     public void OpenDocument(OpenedDocumentEntry entry)
     {
-        var request = OpenedDocumentMapper.ToRequestModel(entry);
-        var response = OpenedDocumentMapper.ToResponseModel(entry);
-
-        var vm = new RequestDocumentViewModel(
-            _httpExecutor,
-            _historyService,
-            _savedRequestService,
-            request,
-            response);
+        var vm = CreateDocument(
+            OpenedDocumentMapper.ToRequestModel(entry),
+            OpenedDocumentMapper.ToResponseModel(entry));
 
         OpenedDocumentMapper.ApplyAuth(entry, vm.Auth);
 
