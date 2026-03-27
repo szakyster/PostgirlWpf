@@ -1,7 +1,8 @@
 ﻿<UserControl x:Class="Postgirl.Presentation.Views.RequestDocument.Parts.RequestBodyView"
 			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 xmlns:body="clr-namespace:Postgirl.Domain.Http.Body">
+			 xmlns:body="clr-namespace:Postgirl.Domain.Http.Body"
+			 xmlns:controls="clr-namespace:Postgirl.Presentation.Controls">
 
 	<Grid Margin="8">
 		<Grid.RowDefinitions>
@@ -28,22 +29,24 @@
 		<Grid Grid.Row="1">
 
 			<!-- TEXT BODY -->
-			<TextBox Text="{Binding TextBodyText}"
-         AcceptsReturn="True"
-         FontFamily="Consolas"
-         VerticalScrollBarVisibility="Auto"
-         Visibility="{Binding SelectedBodyType,
-             Converter={StaticResource BodyTypeToVisibilityConverter},
-             ConverterParameter=Text}" />
+			<controls:VariableAwareTextBox
+				Text="{Binding TextBodyText}"
+				AcceptsReturn="True"
+				FontFamily="Consolas"
+				VariableBrushSelector="{Binding VariableBrushSelector}"
+				Visibility="{Binding SelectedBodyType,
+					Converter={StaticResource BodyTypeToVisibilityConverter},
+					ConverterParameter=Text}" />
 
 			<!-- JSON BODY -->
-			<TextBox Text="{Binding JsonBodyText}"
-         AcceptsReturn="True"
-         FontFamily="Consolas"
-         VerticalScrollBarVisibility="Auto"
-         Visibility="{Binding SelectedBodyType,
-             Converter={StaticResource BodyTypeToVisibilityConverter},
-             ConverterParameter=Json}" />
+			<controls:VariableAwareTextBox
+				Text="{Binding JsonBodyText}"
+				AcceptsReturn="True"
+				FontFamily="Consolas"
+				VariableBrushSelector="{Binding VariableBrushSelector}"
+				Visibility="{Binding SelectedBodyType,
+					Converter={StaticResource BodyTypeToVisibilityConverter},
+					ConverterParameter=Json}" />
 
 			<!-- FORM BODY -->
 			<Grid Visibility="{Binding SelectedBodyType,
