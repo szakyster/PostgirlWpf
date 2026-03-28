@@ -68,9 +68,30 @@
         Binding="{Binding Key}"
         Width="200"/>
 
-						<DataGridTextColumn Header="Value"
-        Binding="{Binding Value}"
-        Width="*"/>
+						<DataGridTemplateColumn Header="Value" Width="*">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<controls:VariableAwareTextBox
+										Text="{Binding Value}"
+										IsReadOnly="True"
+										IsHitTestVisible="False"
+										Background="Transparent"
+										BorderThickness="0"
+										VariableBrushSelector="{Binding DataContext.VariableBrushSelector,
+											RelativeSource={RelativeSource AncestorType=UserControl}}" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+							<DataGridTemplateColumn.CellEditingTemplate>
+								<DataTemplate>
+									<controls:VariableAwareTextBox
+										Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+										Background="Transparent"
+										BorderThickness="0"
+										VariableBrushSelector="{Binding DataContext.VariableBrushSelector,
+											RelativeSource={RelativeSource AncestorType=UserControl}}" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellEditingTemplate>
+						</DataGridTemplateColumn>
 
 						<DataGridTemplateColumn Width="40">
 							<DataGridTemplateColumn.CellTemplate>
