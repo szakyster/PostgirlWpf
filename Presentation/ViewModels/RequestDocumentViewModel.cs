@@ -160,7 +160,7 @@ public class RequestDocumentViewModel : BaseViewModel
     }
     private void AddFormItem()
     {
-        var domain = new FormUrlEncodedItem();
+        var domain = new FormUrlEncodedItem { Key = "key" };
         var vm = new FormItemViewModel(domain, RemoveFormItem);
         FormItems.Add(vm);
         UpdateSystemHeaders();
@@ -224,7 +224,6 @@ public class RequestDocumentViewModel : BaseViewModel
                 break;
 
             case BodyType.None:
-            case BodyType.Xml:
             default:
                 _request.Body = null;
                 break;
@@ -258,7 +257,6 @@ public class RequestDocumentViewModel : BaseViewModel
                 break;
 
             case BodyType.None:
-            case BodyType.Xml:
             default:
                 _request.Body = null;
                 break;

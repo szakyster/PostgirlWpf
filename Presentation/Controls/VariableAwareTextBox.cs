@@ -14,7 +14,7 @@ public class VariableAwareTextBox : Control
     private const string PartEditor = "PART_Editor";
 
     private static readonly Regex VariablePattern =
-        new(@"\{\{([^}]+)\}\}", RegexOptions.Compiled);
+        new(@"\{\{([\w\-\.]+)\}\}", RegexOptions.Compiled);
 
     private const double SingleLinePageWidth = 100_000;
 
@@ -85,6 +85,27 @@ public class VariableAwareTextBox : Control
 
     #endregion
 
+    #region IsReadOnly
+
+    public static readonly DependencyProperty IsReadOnlyProperty =
+        DependencyProperty.Register(
+            nameof(IsReadOnly), typeof(bool), typeof(VariableAwareTextBox),
+            new PropertyMetadata(false, OnIsReadOnlyChanged));
+
+    public bool IsReadOnly
+    {
+        get => (bool)GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
+    }
+
+    private static void OnIsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is VariableAwareTextBox tb && tb._editor != null)
+            tb._editor.IsReadOnly = (bool)e.NewValue;
+    }
+
+    #endregion
+
     #region AcceptsReturn
 
     public static readonly DependencyProperty AcceptsReturnProperty =
@@ -135,6 +156,7 @@ public class VariableAwareTextBox : Control
         if (_editor != null)
         {
             _editor.Document.PagePadding = new Thickness(0);
+            _editor.IsReadOnly = IsReadOnly;
             _editor.AcceptsReturn = AcceptsReturn;
             ApplySingleLineConstraint();
             _editor.TextChanged += OnEditorTextChanged;
