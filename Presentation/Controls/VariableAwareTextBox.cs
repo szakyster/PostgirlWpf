@@ -18,8 +18,12 @@ public class VariableAwareTextBox : Control
 
     private const double SingleLinePageWidth = 100_000;
 
+    private static readonly string[] TestVariables = ["baseUrl", "authToken", "userId", "environment", "apiKey"];
+
     private RichTextBox? _editor;
     private bool _isUpdating;
+    private int _savedCaretOffset;
+    private int? _pendingCaretOffset;
 
     #region Text
 
@@ -149,7 +153,10 @@ public class VariableAwareTextBox : Control
         base.OnApplyTemplate();
 
         if (_editor != null)
+        {
             _editor.TextChanged -= OnEditorTextChanged;
+            _editor.ContextMenuOpening -= OnContextMenuOpening;
+        }
 
         _editor = GetTemplateChild(PartEditor) as RichTextBox;
 
@@ -158,7 +165,9 @@ public class VariableAwareTextBox : Control
             _editor.Document.PagePadding = new Thickness(0);
             _editor.IsReadOnly = IsReadOnly;
             _editor.AcceptsReturn = AcceptsReturn;
+            _editor.ContextMenu = new ContextMenu();
             ApplySingleLineConstraint();
+            _editor.ContextMenuOpening += OnContextMenuOpening;
             _editor.TextChanged += OnEditorTextChanged;
             RebuildDocument();
         }
@@ -194,7 +203,8 @@ public class VariableAwareTextBox : Control
         _editor.TextChanged -= OnEditorTextChanged;
         try
         {
-            var caretOffset = GetCaretOffset();
+            var caretOffset = _pendingCaretOffset ?? GetCaretOffset();
+            _pendingCaretOffset = null;
 
             _editor.Document.Blocks.Clear();
 
@@ -288,5 +298,37 @@ public class VariableAwareTextBox : Control
         }
 
         _editor!.CaretPosition = paragraph.ContentEnd;
+    }
+
+    private void OnContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        _savedCaretOffset = GetCaretOffset();
+
+        var menu = _editor!.ContextMenu!;
+        menu.Items.Clear();
+
+        if (TestVariables.Length == 0)
+        {
+            menu.Items.Add(new MenuItem { Header = "(No variables defined)", IsEnabled = false });
+            return;
+        }
+
+        foreach (var variable in TestVariables)
+        {
+            var item = new MenuItem { Header = variable };
+            var captured = variable;
+            item.Click += (_, _) => InsertVariable(captured);
+            menu.Items.Add(item);
+        }
+    }
+
+    private void InsertVariable(string variableName)
+    {
+        var insertion = $"{{{{{variableName}}}}}";
+        var text = Text ?? string.Empty;
+        var insertPos = Math.Clamp(_savedCaretOffset, 0, text.Length);
+
+        _pendingCaretOffset = insertPos + insertion.Length;
+        Text = text[..insertPos] + insertion + text[insertPos..];
     }
 }
