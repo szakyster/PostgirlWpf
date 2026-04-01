@@ -358,8 +358,6 @@
 				Value="1" />
 		<Setter Property="Padding"
 				Value="6,4" />
-		<Setter Property="HighlightBrush"
-				Value="{StaticResource Brush.Accent}" />
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type controls:VariableAwareTextBox}">

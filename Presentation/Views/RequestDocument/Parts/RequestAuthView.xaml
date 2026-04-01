@@ -76,8 +76,7 @@ Padding="12">
 													Grid.Row="1"
 													Text="{Binding Auth.BearerToken, UpdateSourceTrigger=PropertyChanged}"
 													AcceptsReturn="False"
-													MinWidth="300"
-													VariableBrushSelector="{Binding VariableBrushSelector}" />
+													MinWidth="300" />
 
 											<TextBlock Grid.Row="2"
 													   Text="The token will be sent in the Authorization header."

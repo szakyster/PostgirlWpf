@@ -1,10 +1,13 @@
 #nullable enable
 using System;
+using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Microsoft.Extensions.DependencyInjection;
+using Postgirl.Services;
 
 namespace Postgirl.Presentation.Controls;
 
@@ -18,8 +21,11 @@ public class VariableAwareTextBox : Control
 
     private const double SingleLinePageWidth = 100_000;
 
+    private VariablesService? _variablesService;
     private RichTextBox? _editor;
     private bool _isUpdating;
+    private int _savedCaretOffset;
+    private int? _pendingCaretOffset;
 
     #region Text
 
@@ -41,46 +47,6 @@ public class VariableAwareTextBox : Control
     {
         if (d is VariableAwareTextBox tb && !tb._isUpdating)
             tb.RebuildDocument();
-    }
-
-    #endregion
-
-    #region HighlightBrush
-
-    public static readonly DependencyProperty HighlightBrushProperty =
-        DependencyProperty.Register(
-            nameof(HighlightBrush), typeof(Brush), typeof(VariableAwareTextBox),
-            new PropertyMetadata(Brushes.Gold, OnRenderPropertyChanged));
-
-    /// <summary>
-    /// The brush applied to <c>{{variable}}</c> tokens.
-    /// Overridden per-token by <see cref="VariableBrushSelector"/> when set.
-    /// </summary>
-    public Brush HighlightBrush
-    {
-        get => (Brush)GetValue(HighlightBrushProperty);
-        set => SetValue(HighlightBrushProperty, value);
-    }
-
-    #endregion
-
-    #region VariableBrushSelector
-
-    public static readonly DependencyProperty VariableBrushSelectorProperty =
-        DependencyProperty.Register(
-            nameof(VariableBrushSelector), typeof(Func<string, Brush>), typeof(VariableAwareTextBox),
-            new PropertyMetadata(null, OnRenderPropertyChanged));
-
-    /// <summary>
-    /// Optional per-variable brush selector. Receives the variable name (without <c>{{ }}</c>)
-    /// and returns the brush to use. Falls back to <see cref="HighlightBrush"/> when <c>null</c>.
-    /// Raise <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> for this
-    /// property whenever the underlying condition changes to trigger a re-render.
-    /// </summary>
-    public Func<string, Brush>? VariableBrushSelector
-    {
-        get => (Func<string, Brush>?)GetValue(VariableBrushSelectorProperty);
-        set => SetValue(VariableBrushSelectorProperty, value);
     }
 
     #endregion
@@ -138,18 +104,23 @@ public class VariableAwareTextBox : Control
             : SingleLinePageWidth;
     }
 
-    private static void OnRenderPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is VariableAwareTextBox tb)
-            tb.RebuildDocument();
-    }
-
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
 
         if (_editor != null)
+        {
             _editor.TextChanged -= OnEditorTextChanged;
+            _editor.ContextMenuOpening -= OnContextMenuOpening;
+        }
+
+        if (_variablesService != null)
+            _variablesService.Items.CollectionChanged -= OnVariablesChanged;
+
+        _variablesService = App.AppHost?.Services.GetService<VariablesService>();
+
+        if (_variablesService != null)
+            _variablesService.Items.CollectionChanged += OnVariablesChanged;
 
         _editor = GetTemplateChild(PartEditor) as RichTextBox;
 
@@ -158,7 +129,9 @@ public class VariableAwareTextBox : Control
             _editor.Document.PagePadding = new Thickness(0);
             _editor.IsReadOnly = IsReadOnly;
             _editor.AcceptsReturn = AcceptsReturn;
+            _editor.ContextMenu = new ContextMenu();
             ApplySingleLineConstraint();
+            _editor.ContextMenuOpening += OnContextMenuOpening;
             _editor.TextChanged += OnEditorTextChanged;
             RebuildDocument();
         }
@@ -194,7 +167,8 @@ public class VariableAwareTextBox : Control
         _editor.TextChanged -= OnEditorTextChanged;
         try
         {
-            var caretOffset = GetCaretOffset();
+            var caretOffset = _pendingCaretOffset ?? GetCaretOffset();
+            _pendingCaretOffset = null;
 
             _editor.Document.Blocks.Clear();
 
@@ -228,7 +202,7 @@ public class VariableAwareTextBox : Control
                 paragraph.Inlines.Add(new Run(text[lastIndex..match.Index]) { Foreground = Foreground });
 
             var variableName = match.Groups[1].Value;
-            var brush = VariableBrushSelector?.Invoke(variableName) ?? HighlightBrush;
+            var brush = GetVariableBrush(variableName);
             paragraph.Inlines.Add(new Run(match.Value) { Foreground = brush });
 
             lastIndex = match.Index + match.Length;
@@ -288,5 +262,49 @@ public class VariableAwareTextBox : Control
         }
 
         _editor!.CaretPosition = paragraph.ContentEnd;
+    }
+
+    private void OnContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        _savedCaretOffset = GetCaretOffset();
+
+        var menu = _editor!.ContextMenu!;
+        menu.Items.Clear();
+
+        var variables = _variablesService?.Items;
+
+        if (variables == null || variables.Count == 0)
+        {
+            menu.Items.Add(new MenuItem { Header = "(No variables defined)", IsEnabled = false });
+            return;
+        }
+
+        foreach (var entry in variables)
+        {
+            var item = new MenuItem { Header = entry.Key };
+            var captured = entry.Key;
+            item.Click += (_, _) => InsertVariable(captured);
+            menu.Items.Add(item);
+        }
+    }
+
+    private void OnVariablesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        => RebuildDocument();
+
+    private Brush GetVariableBrush(string variableName)
+    {
+        var exists = _variablesService?.VariableExists(variableName) ?? false;
+        var key = exists ? "Brush.Success" : "Brush.Warning";
+        return Application.Current.Resources[key] as Brush ?? Brushes.Gold;
+    }
+
+    private void InsertVariable(string variableName)
+    {
+        var insertion = $"{{{{{variableName}}}}}";
+        var text = Text ?? string.Empty;
+        var insertPos = Math.Clamp(_savedCaretOffset, 0, text.Length);
+
+        _pendingCaretOffset = insertPos + insertion.Length;
+        Text = text[..insertPos] + insertion + text[insertPos..];
     }
 }

@@ -33,7 +33,6 @@
 				Text="{Binding TextBodyText}"
 				AcceptsReturn="True"
 				FontFamily="Consolas"
-				VariableBrushSelector="{Binding VariableBrushSelector}"
 				Visibility="{Binding SelectedBodyType,
 					Converter={StaticResource BodyTypeToVisibilityConverter},
 					ConverterParameter=Text}" />
@@ -43,7 +42,6 @@
 				Text="{Binding JsonBodyText}"
 				AcceptsReturn="True"
 				FontFamily="Consolas"
-				VariableBrushSelector="{Binding VariableBrushSelector}"
 				Visibility="{Binding SelectedBodyType,
 					Converter={StaticResource BodyTypeToVisibilityConverter},
 					ConverterParameter=Json}" />
@@ -76,9 +74,7 @@
 										IsReadOnly="True"
 										IsHitTestVisible="False"
 										Background="Transparent"
-										BorderThickness="0"
-										VariableBrushSelector="{Binding DataContext.VariableBrushSelector,
-											RelativeSource={RelativeSource AncestorType=UserControl}}" />
+										BorderThickness="0" />
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 							<DataGridTemplateColumn.CellEditingTemplate>
@@ -86,9 +82,7 @@
 									<controls:VariableAwareTextBox
 										Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
 										Background="Transparent"
-										BorderThickness="0"
-										VariableBrushSelector="{Binding DataContext.VariableBrushSelector,
-											RelativeSource={RelativeSource AncestorType=UserControl}}" />
+										BorderThickness="0" />
 								</DataTemplate>
 							</DataGridTemplateColumn.CellEditingTemplate>
 						</DataGridTemplateColumn>
