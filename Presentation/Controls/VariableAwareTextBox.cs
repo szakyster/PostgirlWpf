@@ -1,10 +1,13 @@
 #nullable enable
 using System;
+using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Microsoft.Extensions.DependencyInjection;
+using Postgirl.Services;
 
 namespace Postgirl.Presentation.Controls;
 
@@ -18,8 +21,7 @@ public class VariableAwareTextBox : Control
 
     private const double SingleLinePageWidth = 100_000;
 
-    private static readonly string[] TestVariables = ["baseUrl", "authToken", "userId", "environment", "apiKey"];
-
+    private VariablesService? _variablesService;
     private RichTextBox? _editor;
     private bool _isUpdating;
     private int _savedCaretOffset;
@@ -111,6 +113,14 @@ public class VariableAwareTextBox : Control
             _editor.TextChanged -= OnEditorTextChanged;
             _editor.ContextMenuOpening -= OnContextMenuOpening;
         }
+
+        if (_variablesService != null)
+            _variablesService.Items.CollectionChanged -= OnVariablesChanged;
+
+        _variablesService = App.AppHost?.Services.GetService<VariablesService>();
+
+        if (_variablesService != null)
+            _variablesService.Items.CollectionChanged += OnVariablesChanged;
 
         _editor = GetTemplateChild(PartEditor) as RichTextBox;
 
@@ -261,24 +271,30 @@ public class VariableAwareTextBox : Control
         var menu = _editor!.ContextMenu!;
         menu.Items.Clear();
 
-        if (TestVariables.Length == 0)
+        var variables = _variablesService?.Items;
+
+        if (variables == null || variables.Count == 0)
         {
             menu.Items.Add(new MenuItem { Header = "(No variables defined)", IsEnabled = false });
             return;
         }
 
-        foreach (var variable in TestVariables)
+        foreach (var entry in variables)
         {
-            var item = new MenuItem { Header = variable };
-            var captured = variable;
+            var item = new MenuItem { Header = entry.Key };
+            var captured = entry.Key;
             item.Click += (_, _) => InsertVariable(captured);
             menu.Items.Add(item);
         }
     }
 
-    private static Brush GetVariableBrush(string variableName)
+    private void OnVariablesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        => RebuildDocument();
+
+    private Brush GetVariableBrush(string variableName)
     {
-        var key = Array.IndexOf(TestVariables, variableName) >= 0 ? "Brush.Success" : "Brush.Warning";
+        var exists = _variablesService?.VariableExists(variableName) ?? false;
+        var key = exists ? "Brush.Success" : "Brush.Warning";
         return Application.Current.Resources[key] as Brush ?? Brushes.Gold;
     }
 
