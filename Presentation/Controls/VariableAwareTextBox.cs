@@ -49,46 +49,6 @@ public class VariableAwareTextBox : Control
 
     #endregion
 
-    #region HighlightBrush
-
-    public static readonly DependencyProperty HighlightBrushProperty =
-        DependencyProperty.Register(
-            nameof(HighlightBrush), typeof(Brush), typeof(VariableAwareTextBox),
-            new PropertyMetadata(Brushes.Gold, OnRenderPropertyChanged));
-
-    /// <summary>
-    /// The brush applied to <c>{{variable}}</c> tokens.
-    /// Overridden per-token by <see cref="VariableBrushSelector"/> when set.
-    /// </summary>
-    public Brush HighlightBrush
-    {
-        get => (Brush)GetValue(HighlightBrushProperty);
-        set => SetValue(HighlightBrushProperty, value);
-    }
-
-    #endregion
-
-    #region VariableBrushSelector
-
-    public static readonly DependencyProperty VariableBrushSelectorProperty =
-        DependencyProperty.Register(
-            nameof(VariableBrushSelector), typeof(Func<string, Brush>), typeof(VariableAwareTextBox),
-            new PropertyMetadata(null, OnRenderPropertyChanged));
-
-    /// <summary>
-    /// Optional per-variable brush selector. Receives the variable name (without <c>{{ }}</c>)
-    /// and returns the brush to use. Falls back to <see cref="HighlightBrush"/> when <c>null</c>.
-    /// Raise <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> for this
-    /// property whenever the underlying condition changes to trigger a re-render.
-    /// </summary>
-    public Func<string, Brush>? VariableBrushSelector
-    {
-        get => (Func<string, Brush>?)GetValue(VariableBrushSelectorProperty);
-        set => SetValue(VariableBrushSelectorProperty, value);
-    }
-
-    #endregion
-
     #region IsReadOnly
 
     public static readonly DependencyProperty IsReadOnlyProperty =
@@ -140,12 +100,6 @@ public class VariableAwareTextBox : Control
         _editor.Document.PageWidth = AcceptsReturn
             ? double.NaN
             : SingleLinePageWidth;
-    }
-
-    private static void OnRenderPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is VariableAwareTextBox tb)
-            tb.RebuildDocument();
     }
 
     public override void OnApplyTemplate()
@@ -238,7 +192,7 @@ public class VariableAwareTextBox : Control
                 paragraph.Inlines.Add(new Run(text[lastIndex..match.Index]) { Foreground = Foreground });
 
             var variableName = match.Groups[1].Value;
-            var brush = VariableBrushSelector?.Invoke(variableName) ?? HighlightBrush;
+            var brush = GetVariableBrush(variableName);
             paragraph.Inlines.Add(new Run(match.Value) { Foreground = brush });
 
             lastIndex = match.Index + match.Length;
@@ -320,6 +274,12 @@ public class VariableAwareTextBox : Control
             item.Click += (_, _) => InsertVariable(captured);
             menu.Items.Add(item);
         }
+    }
+
+    private static Brush GetVariableBrush(string variableName)
+    {
+        var key = Array.IndexOf(TestVariables, variableName) >= 0 ? "Brush.Success" : "Brush.Warning";
+        return Application.Current.Resources[key] as Brush ?? Brushes.Gold;
     }
 
     private void InsertVariable(string variableName)

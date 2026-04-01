@@ -51,9 +51,7 @@
 								IsReadOnly="True"
 								IsHitTestVisible="False"
 								Background="Transparent"
-								BorderThickness="0"
-								VariableBrushSelector="{Binding DataContext.VariableBrushSelector,
-									RelativeSource={RelativeSource AncestorType=UserControl}}" />
+								BorderThickness="0" />
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 					<DataGridTemplateColumn.CellEditingTemplate>
@@ -61,9 +59,7 @@
 							<controls:VariableAwareTextBox
 								Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
 								Background="Transparent"
-								BorderThickness="0"
-								VariableBrushSelector="{Binding DataContext.VariableBrushSelector,
-									RelativeSource={RelativeSource AncestorType=UserControl}}" />
+								BorderThickness="0" />
 						</DataTemplate>
 					</DataGridTemplateColumn.CellEditingTemplate>
 				</DataGridTemplateColumn>

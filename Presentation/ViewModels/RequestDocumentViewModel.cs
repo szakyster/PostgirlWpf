@@ -25,21 +25,17 @@ public class RequestDocumentViewModel : BaseViewModel
     private readonly HttpRequestModel _request;
     private readonly IHttpExecutor _httpExecutor;
     private readonly SavedRequestService _savedRequestService;
-    private readonly VariablesService _variablesService;
     private HttpResponseResult _response;
     private CancellationTokenSource _cancellationTokenSource;
 
 
-    public RequestDocumentViewModel(IHttpExecutor httpExecutor, HistoryService historyService, SavedRequestService savedRequestService, VariablesService variablesService, HttpRequestModel request, HttpResponseResult response = null)
+    public RequestDocumentViewModel(IHttpExecutor httpExecutor, HistoryService historyService, SavedRequestService savedRequestService, HttpRequestModel request, HttpResponseResult response = null)
     {
         _historyService = historyService;
         _request = request;
         _httpExecutor = httpExecutor;
         _savedRequestService = savedRequestService;
-        _variablesService = variablesService;
         _response = response;
-
-        _variablesService.Items.CollectionChanged += (_, _) => OnPropertyChanged(nameof(VariableBrushSelector));
 
         SendCommand = new AsyncRelayCommand(SendAsync);
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
@@ -62,11 +58,6 @@ public class RequestDocumentViewModel : BaseViewModel
 
         SendButtonText = "Send";
     }
-
-    public Func<string, Brush> VariableBrushSelector => name =>
-        _variablesService.VariableExists(name)
-            ? (Brush)Application.Current.Resources["Brush.Success"]
-            : (Brush)Application.Current.Resources["Brush.Warning"];
 
     public HttpRequestModel Domain => _request;
 

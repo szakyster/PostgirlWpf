@@ -16,8 +16,7 @@
 
         <controls:VariableAwareTextBox Grid.Column="1"
                                        Margin="10,0"
-                                       Text="{Binding Url}"
-                                       VariableBrushSelector="{Binding VariableBrushSelector}" />
+                                       Text="{Binding Url}" />
 
         <StackPanel Grid.Column="2" Orientation="Horizontal">
 

@@ -77,7 +77,7 @@ public class MainViewModel : BaseViewModel
     public ICommand DeleteSavedRequestCommand { get; }
 
     private RequestDocumentViewModel CreateDocument(HttpRequestModel request, HttpResponseResult response = null)
-        => new RequestDocumentViewModel(_httpExecutor, _historyService, _savedRequestService, _variablesService, request, response);
+        => new RequestDocumentViewModel(_httpExecutor, _historyService, _savedRequestService, request, response);
 
     private void AddNewDocument()
     {
