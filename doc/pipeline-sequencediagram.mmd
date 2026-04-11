@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor Caller
+    participant PE as HttpPipeline<br/>(IHttpExecutor)
+    participant VS as VariableSubstitution<br/>Step (Order=10)
+    participant SE as ScriptExecution<br/>Step (Order=50)
+    participant EX as HttpExecutor<br/>(terminal)
+
+    Note over PE: ExecuteAsync(model) called
+    Caller->>PE: ExecuteAsync(model, ct)
+
+    Note over PE: Snapshot of registered steps<br/>BuildPipeline() — Aggregate
+
+    PE->>VS: InvokeAsync(context, next, ct)
+
+    Note over VS: PRE: substitute {{variables}}<br/>context.Request mutated
+    VS->>SE: next() → InvokeAsync(context, next, ct)
+
+    Note over SE: PRE: run pre-request script<br/>context.Request still mutable
+    SE->>EX: next() → ExecuteAsync(context.Request, ct)
+
+    Note over EX: Actual HTTP call<br/>context.Result set
+    EX-->>SE: context.Result set
+
+    Note over SE: POST: run post-response script<br/>context.Result readable / mutable
+    SE-->>VS: return
+
+    Note over VS: POST: (optional processing)
+    VS-->>PE: return
+
+    PE-->>Caller: context.Result (HttpExecutionResult)
+
+    Note over Caller: Unaware of the pipeline,<br/>only calls IHttpExecutor
