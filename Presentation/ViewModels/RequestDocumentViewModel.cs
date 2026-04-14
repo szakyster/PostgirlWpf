@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -258,7 +259,13 @@ public class RequestDocumentViewModel : BaseViewModel
     #region response
     public string ResponseBody
     {
-        get => _response?.Body;
+        get
+        {
+            var body = _response?.Body;
+            if (body is not null && IsJsonContentType(_response?.ContentType))
+                return FormatJson(body);
+            return body;
+        }
         set
         {
             if (_response != null && _response.Body != value)
@@ -578,5 +585,31 @@ public class RequestDocumentViewModel : BaseViewModel
     {
         _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
         _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
+    }
+
+    private static bool IsJsonContentType(string? mediaType)
+    {
+        if (string.IsNullOrWhiteSpace(mediaType))
+            return false;
+
+        return mediaType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
+               mediaType.Contains("text/json", StringComparison.OrdinalIgnoreCase) ||
+               mediaType.Contains("+json", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string FormatJson(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return json;
+
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            return JsonSerializer.Serialize(document, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch
+        {
+            return json;
+        }
     }
 }

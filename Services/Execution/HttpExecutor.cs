@@ -6,7 +6,6 @@ using System.Text;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.Json;
 using Postgirl.Domain.Execution;
 using Postgirl.Domain.Http;
 
@@ -55,12 +54,7 @@ public class HttpExecutor : IHttpExecutor
             }
 
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-
-            // Format JSON if content type is application/json
-            if (IsJsonContentType(response.Content.Headers.ContentType?.MediaType))
-            {
-                responseBody = FormatJson(responseBody);
-            }
+            var contentType = response.Content.Headers.ContentType?.MediaType;
 
             return new HttpExecutionResult
             {
@@ -71,6 +65,7 @@ public class HttpExecutor : IHttpExecutor
                     StatusCode = (int)response.StatusCode,
                     Headers = ExtractHeaders(response),
                     Body = responseBody,
+                    ContentType = contentType,
                     ResponseSize = Encoding.UTF8.GetByteCount(responseBody),
                     ElapsedMilliseconds = stopwatch.ElapsedMilliseconds
                 }
@@ -163,7 +158,9 @@ public class HttpExecutor : IHttpExecutor
 
         if (string.IsNullOrEmpty(mediaType)) return false;
         if (mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase)) return false;
-        if (IsJsonContentType(mediaType)) return false;
+        if (mediaType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
+            mediaType.Contains("text/json", StringComparison.OrdinalIgnoreCase) ||
+            mediaType.Contains("+json", StringComparison.OrdinalIgnoreCase)) return false;
         if (mediaType.Contains("xml", StringComparison.OrdinalIgnoreCase)) return false;
 
         return true;
@@ -181,33 +178,4 @@ public class HttpExecutor : IHttpExecutor
         return $"download.{ext}";
     }
 
-    private static bool IsJsonContentType(string mediaType)
-    {
-        if (string.IsNullOrWhiteSpace(mediaType))
-            return false;
-
-        return mediaType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
-               mediaType.Contains("text/json", StringComparison.OrdinalIgnoreCase) ||
-               mediaType.Contains("+json", StringComparison.OrdinalIgnoreCase);
     }
-
-    private static string FormatJson(string json)
-    {
-        if (string.IsNullOrWhiteSpace(json))
-            return json;
-
-        try
-        {
-            using var document = JsonDocument.Parse(json);
-            return JsonSerializer.Serialize(document, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-        }
-        catch
-        {
-            // If parsing fails, return original
-            return json;
-        }
-    }
-}
