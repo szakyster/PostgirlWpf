@@ -8,6 +8,7 @@ using Postgirl.Presentation.ViewModels;
 using Postgirl.Presentation.Views;
 using Postgirl.Services;
 using Postgirl.Services.Execution;
+using Postgirl.Services.Execution.Steps;
 
 namespace Postgirl
 {
@@ -74,7 +75,12 @@ namespace Postgirl
         {
             //services
             services.AddSingleton<HttpExecutor>();
-            services.AddSingleton<IHttpPipeline>(sp => new HttpPipeline(sp.GetRequiredService<HttpExecutor>()));
+            services.AddSingleton<IHttpPipeline>(sp =>
+            {
+                var pipeline = new HttpPipeline(sp.GetRequiredService<HttpExecutor>());
+                pipeline.Register(new VariableSubstitutionStep(sp.GetRequiredService<VariablesService>()));
+                return pipeline;
+            });
             services.AddSingleton<IHttpExecutor>(sp => sp.GetRequiredService<IHttpPipeline>());
             services.AddSingleton<HistoryService>();
             services.AddSingleton<SavedRequestService>();
