@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Postgirl.Domain.Http;
+using Postgirl.Domain.Http.Body;
 using Postgirl.Services;
 
 namespace Postgirl.Services.Execution.Steps;
@@ -24,24 +25,49 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
         Func<Task> next,
         CancellationToken cancellationToken = default)
     {
-        // TODO: substitute {{variable}} placeholders in context.Request
+        context.Request = ApplyTo(context.Request);
         return next();
     }
 
-    private string Substitute(string? input)
+    private HttpRequestModel ApplyTo(HttpRequestModel original)
     {
-        if (string.IsNullOrEmpty(input))
-            return input ?? string.Empty;
-
-        return PlaceholderRegex.Replace(input, match =>
+        return new HttpRequestModel
         {
-            var key = match.Groups[1].Value;
-            var entry = _variablesService.Items.FirstOrDefault(e => e.Key == key);
-            return entry is not null ? entry.Value : match.Value;
-        });
+            Method          = original.Method,
+            Url             = Substitute(original.Url),
+            Headers         = original.Headers
+                                  .Select(h => new RequestHeader(h.Key, Substitute(h.Value), h.IsSystem) { IsEnabled = h.IsEnabled })
+                                  .ToList(),
+            Parameters      = original.Parameters
+                                  .Select(p => new RequestParameter(p.Key, Substitute(p.Value)) { IsEnabled = p.IsEnabled })
+                                  .ToList(),
+            Body            = SubstituteBody(original.Body),
+            BearerToken     = Substitute(original.BearerToken),
+            Timeout         = original.Timeout,
+            FollowRedirects = original.FollowRedirects,
+            IgnoreSslErrors = original.IgnoreSslErrors
+        };
     }
 
-    // Matches {{key}} where key may contain word chars, hyphens and dots (see VariableKeyValidator)
-    private static readonly Regex PlaceholderRegex =
-        new(@"\{\{([\w\-\.]+)\}\}", RegexOptions.Compiled);
+    private HttpBody SubstituteBody(HttpBody? body) => body switch
+    {
+        TextBody text => new TextBody
+        {
+            Content     = Substitute(text.Content),
+            ContentType = text.ContentType
+        },
+        JsonBody json => new JsonBody
+        {
+            Json = Substitute(json.Json)
+        },
+        FormUrlEncodedBody form => new FormUrlEncodedBody
+        {
+            Items = form.Items
+                        .Select(i => new FormUrlEncodedItem { Key = Substitute(i.Key), Value = Substitute(i.Value) })
+                        .ToList()
+        },
+        _ => body ?? new TextBody()
+    };
+
+    private string Substitute(string? input) => _variablesService.Substitute(input);
 }
