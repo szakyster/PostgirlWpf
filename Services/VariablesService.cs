@@ -33,6 +33,26 @@ public class VariablesService
     private static readonly Regex PlaceholderRegex =
         new(@"\{\{([\w\-\.]+)\}\}", RegexOptions.Compiled);
 
+    public void SeedDefaults()
+    {
+        var defaults = new[]
+        {
+            new VariableEntry { Key = "base_url",        Value = "https://api.example.com" },
+            new VariableEntry { Key = "api_version",     Value = "v2" },
+            new VariableEntry { Key = "api_key",         Value = "sk-test-abc123xyz" },
+            new VariableEntry { Key = "auth_token",      Value = "Bearer eyJhbGciOiJIUzI1NiJ9..." },
+            new VariableEntry { Key = "tenant_id",       Value = "acme-corp" },
+            new VariableEntry { Key = "user_id",         Value = "usr_98765" },
+            new VariableEntry { Key = "timeout_seconds", Value = "30" },
+            new VariableEntry { Key = "page_size",       Value = "25" },
+            new VariableEntry { Key = "environment",     Value = "staging" },
+            new VariableEntry { Key = "region",          Value = "eu-west-1" },
+        };
+
+        foreach (var v in defaults)
+            Items.Add(v);
+    }
+
     public List<VariableEntry> Export() => Items.ToList();
 
     public void Import(IEnumerable<VariableEntry> entries)

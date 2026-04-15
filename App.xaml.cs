@@ -96,35 +96,20 @@ namespace Postgirl
 
         private async Task InitializeApplicationAsync()
         {
-            var storage = AppHost.Services.GetRequiredService<StorageService>();
-            var history = AppHost.Services.GetRequiredService<HistoryService>();
-            var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
-            var variables = AppHost.Services.GetRequiredService<VariablesService>();
+            var storageService = AppHost.Services.GetRequiredService<StorageService>();
+            var historyService = AppHost.Services.GetRequiredService<HistoryService>();
+            var savedService = AppHost.Services.GetRequiredService<SavedRequestService>();
+            var variablesService = AppHost.Services.GetRequiredService<VariablesService>();
 
-            var state = await storage.LoadAsync();
+            var state = await storageService.LoadAsync();
 
-            history.Import(state.History);
-            saved.Import(state.SavedRequests);
-            variables.Import(state.Variables);
+            historyService.Import(state.History);
+            savedService.Import(state.SavedRequests);
+            variablesService.Import(state.Variables);
 
-            if (variables.Items.Count == 0)
+            if (variablesService.Items.Count == 0)
             {
-                var testVariables = new[]
-                {
-                    new Domain.Variables.VariableEntry { Key = "base_url",        Value = "https://api.example.com" },
-                    new Domain.Variables.VariableEntry { Key = "api_version",     Value = "v2" },
-                    new Domain.Variables.VariableEntry { Key = "api_key",         Value = "sk-test-abc123xyz" },
-                    new Domain.Variables.VariableEntry { Key = "auth_token",      Value = "Bearer eyJhbGciOiJIUzI1NiJ9..." },
-                    new Domain.Variables.VariableEntry { Key = "tenant_id",       Value = "acme-corp" },
-                    new Domain.Variables.VariableEntry { Key = "user_id",         Value = "usr_98765" },
-                    new Domain.Variables.VariableEntry { Key = "timeout_seconds", Value = "30" },
-                    new Domain.Variables.VariableEntry { Key = "page_size",       Value = "25" },
-                    new Domain.Variables.VariableEntry { Key = "environment",     Value = "staging" },
-                    new Domain.Variables.VariableEntry { Key = "region",          Value = "eu-west-1" },
-                };
-
-                foreach (var v in testVariables)
-                    variables.Add(v);
+                variablesService.SeedDefaults();
             }
 
             // mainViewModel resolved AFTER all imports so VariablesViewModel initializes from populated service
