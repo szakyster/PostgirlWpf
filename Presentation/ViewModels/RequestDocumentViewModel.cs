@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Postgirl.Common;
@@ -15,6 +17,7 @@ using Postgirl.Domain.Http;
 using Postgirl.Domain.Http.Body;
 using Postgirl.Presentation.ViewModels.Authentication;
 using Postgirl.Services;
+using Postgirl.Services.Execution;
 
 namespace Postgirl.Presentation.ViewModels;
 
@@ -23,6 +26,7 @@ public class RequestDocumentViewModel : BaseViewModel
     private readonly HistoryService _historyService;
     private readonly HttpRequestModel _request;
     private readonly IHttpExecutor _httpExecutor;
+    private readonly SavedRequestService _savedRequestService;
     private HttpResponseResult _response;
     private CancellationTokenSource _cancellationTokenSource;
 
@@ -34,6 +38,7 @@ public class RequestDocumentViewModel : BaseViewModel
         _httpExecutor = httpExecutor;
         _savedRequestService = savedRequestService;
         _response = response;
+
         SendCommand = new AsyncRelayCommand(SendAsync);
         AddHeaderCommand = new RelayCommand(() => { AddUserHeader("New-Header", ""); });
         AddParameterCommand = new RelayCommand(() => { AddParameter("param", ""); });
@@ -148,7 +153,7 @@ public class RequestDocumentViewModel : BaseViewModel
     }
     private void AddFormItem()
     {
-        var domain = new FormUrlEncodedItem();
+        var domain = new FormUrlEncodedItem { Key = "key" };
         var vm = new FormItemViewModel(domain, RemoveFormItem);
         FormItems.Add(vm);
         UpdateSystemHeaders();
@@ -165,7 +170,6 @@ public class RequestDocumentViewModel : BaseViewModel
     }
 
     private BodyType _selectedBodyType;
-    private readonly SavedRequestService _savedRequestService;
 
     public BodyType SelectedBodyType
     {
@@ -213,7 +217,6 @@ public class RequestDocumentViewModel : BaseViewModel
                 break;
 
             case BodyType.None:
-            case BodyType.Xml:
             default:
                 _request.Body = null;
                 break;
@@ -247,7 +250,6 @@ public class RequestDocumentViewModel : BaseViewModel
                 break;
 
             case BodyType.None:
-            case BodyType.Xml:
             default:
                 _request.Body = null;
                 break;
@@ -257,7 +259,13 @@ public class RequestDocumentViewModel : BaseViewModel
     #region response
     public string ResponseBody
     {
-        get => _response?.Body;
+        get
+        {
+            var body = _response?.Body;
+            if (body is not null && IsJsonContentType(_response?.ContentType))
+                return FormatJson(body);
+            return body;
+        }
         set
         {
             if (_response != null && _response.Body != value)
@@ -577,5 +585,31 @@ public class RequestDocumentViewModel : BaseViewModel
     {
         _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
         _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
+    }
+
+    private static bool IsJsonContentType(string? mediaType)
+    {
+        if (string.IsNullOrWhiteSpace(mediaType))
+            return false;
+
+        return mediaType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
+               mediaType.Contains("text/json", StringComparison.OrdinalIgnoreCase) ||
+               mediaType.Contains("+json", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string FormatJson(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return json;
+
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            return JsonSerializer.Serialize(document, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch
+        {
+            return json;
+        }
     }
 }

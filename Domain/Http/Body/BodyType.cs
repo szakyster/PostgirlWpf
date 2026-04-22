@@ -7,7 +7,7 @@ public enum BodyType
     None,
     Json,
     Text,
-    Xml,
+    //Xml,
     FormUrlEncoded
 }
 public static class BodyTypeHelper

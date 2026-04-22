@@ -1,0 +1,91 @@
+classDiagram
+    class IHttpExecutor {
+        <<interface>>
+        +ExecuteAsync(model, ct) Task~HttpExecutionResult~
+    }
+
+    class IHttpPipeline {
+        <<interface>>
+        +Steps IReadOnlyList~IHttpPipelineStep~
+        +Register(step) void
+        +Unregister(name) void
+    }
+
+    class HttpPipeline {
+        -List~IHttpPipelineStep~ _steps
+        -ReaderWriterLockSlim _lock
+        -IHttpExecutor _rawExecutor
+        +ExecuteAsync(model, ct) Task~HttpExecutionResult~
+        +Register(step) void
+        +Unregister(name) void
+        -BuildPipeline(steps, context, ct) Func~Task~
+    }
+
+    class HttpExecutor {
+        -HttpClient _client
+        +ExecuteAsync(model, ct) Task~HttpExecutionResult~
+    }
+
+    class IHttpPipelineStep {
+        <<interface>>
+        +Name string
+        +Order int
+        +InvokeAsync(context, next, ct) Task
+    }
+
+    class HttpPipelineContext {
+        +Request HttpRequestModel
+        +Result HttpExecutionResult?
+        +Items IDictionary~string, object?~
+    }
+
+    class PipelineOrder {
+        <<static>>
+        +VariableSubstitution = 10
+        +PreRequestScript = 50
+        +PostResponseScript = 100
+    }
+
+    class VariableSubstitutionStep {
+        +Name "VariableSubstitution"
+        +Order 10
+        +InvokeAsync(context, next, ct) Task
+        -IVariableStore _store
+    }
+
+    class ScriptExecutionStep {
+        +Name "ScriptExecution"
+        +Order 50
+        +InvokeAsync(context, next, ct) Task
+        -IScriptEngine _scriptEngine
+    }
+
+    class IVariableStore {
+        <<interface>>
+        +Substitute(model) HttpRequestModel
+    }
+
+    class IScriptEngine {
+        <<interface>>
+        +RunPreRequestAsync(context, ct) Task
+        +RunPostResponseAsync(context, ct) Task
+    }
+
+    IHttpExecutor <|-- IHttpPipeline
+    IHttpPipeline <|.. HttpPipeline
+    IHttpExecutor <|.. HttpExecutor
+
+    HttpPipeline --> HttpExecutor : terminal step (rawExecutor)
+    HttpPipeline o-- IHttpPipelineStep : manages 0..*
+
+    IHttpPipelineStep <|.. VariableSubstitutionStep
+    IHttpPipelineStep <|.. ScriptExecutionStep
+
+    IHttpPipelineStep ..> HttpPipelineContext : reads and mutates
+
+    VariableSubstitutionStep --> IVariableStore
+    ScriptExecutionStep --> IScriptEngine
+
+    note for IHttpExecutor "Callers only see this interface"
+    note for IHttpPipeline "Used only by startup / configuration code"
+    note for HttpExecutor "Raw HTTP call, outside the pipeline"

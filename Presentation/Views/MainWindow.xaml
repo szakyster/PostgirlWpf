@@ -100,24 +100,39 @@
 					<ScrollViewer VerticalScrollBarVisibility="Auto"
 								  Background="Transparent">
 
-						<StackPanel Margin="8,0,8,12">
+						<StackPanel Margin="8,0,8,6">
 
 							<!-- Saved -->
-							<Expander Header="Saved Requests"
-							          IsExpanded="True"
-							          Margin="0,0,0,12">
+							<Expander x:Name="SavedExpander"
+									  Header="Saved Requests"
+									  IsExpanded="True"
+									  Expanded="Expander_Expanded"
+									  Margin="0,0,0,6">
 
 								<views:SavedRequestsView/>
 
 							</Expander>
 
 							<!-- History -->
-							<Expander Header="History"
-							          IsExpanded="True">
+							<Expander x:Name="HistoryExpander"
+									  Header="History"
+									  IsExpanded="False"
+									  Expanded="Expander_Expanded"
+									  Margin="0,0,0,6">
 
 								<views:HistoryView DataContext="{Binding HistoryViewModel}"/>
 
 							</Expander>
+
+							<!-- Variables -->
+								<Expander x:Name="VariablesExpander"
+										  Header="Variables"
+										  IsExpanded="False"
+										  Expanded="Expander_Expanded">
+
+									<views:VariablesView DataContext="{Binding VariablesViewModel}"/>
+
+								</Expander>
 
 						</StackPanel>
 

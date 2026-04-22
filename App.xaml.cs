@@ -1,4 +1,3 @@
-
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,23 +7,34 @@ using Postgirl.Domain.Persistence;
 using Postgirl.Presentation.ViewModels;
 using Postgirl.Presentation.Views;
 using Postgirl.Services;
+using Postgirl.Services.Execution;
+using Postgirl.Services.Execution.Steps;
 
 namespace Postgirl
 {
-    public partial class App : Application
+    public partial class App
     {
 
         public static IHost AppHost { get; private set; } = null!;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            AppHost = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) => { ConfigureServices(services); })
-                .Build();
+            try
+            {
+                AppHost = Host.CreateDefaultBuilder()
+                    .ConfigureServices((context, services) => { ConfigureServices(services); })
+                    .Build();
 
-            await AppHost.StartAsync();
-            await InitializeApplicationAsync();
-            base.OnStartup(e);
+                await AppHost.StartAsync();
+                await InitializeApplicationAsync();
+                base.OnStartup(e);
+            }
+            catch (Exception)
+            {
+                    // If initialization fails, we still want to show the main window so the user can see the error message
+                    var mainWindow = new MainWindow(null);
+                    mainWindow.Show();
+            }
         }
 
         protected override async void OnExit(ExitEventArgs e)
@@ -33,6 +43,7 @@ namespace Postgirl
             var storage = AppHost.Services.GetRequiredService<StorageService>();
             var history = AppHost.Services.GetRequiredService<HistoryService>();
             var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
+            var variables = AppHost.Services.GetRequiredService<VariablesService>();
             var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
             try
@@ -41,7 +52,9 @@ namespace Postgirl
                 {
                     History = history.Export(),
                     SavedRequests = saved.Export(),
-                    OpenedDocuments = mainViewModel.ExportOpenedDocuments()
+                    Variables = variables.Export(),
+                    OpenedDocuments = mainViewModel.ExportOpenedDocuments(),
+                    ActiveSidebarPanel = mainViewModel.ActiveSidebarPanel
                 };
 
                 storage.SaveAsync(state);
@@ -58,12 +71,20 @@ namespace Postgirl
             }
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceCollection services)
         {
             //services
-            services.AddSingleton<IHttpExecutor, HttpExecutor>();
+            services.AddSingleton<HttpExecutor>();
+            services.AddSingleton<IHttpPipeline>(sp =>
+            {
+                var pipeline = new HttpPipeline(sp.GetRequiredService<HttpExecutor>());
+                pipeline.Register(new VariableSubstitutionStep(sp.GetRequiredService<VariablesService>()));
+                return pipeline;
+            });
+            services.AddSingleton<IHttpExecutor>(sp => sp.GetRequiredService<IHttpPipeline>());
             services.AddSingleton<HistoryService>();
             services.AddSingleton<SavedRequestService>();
+            services.AddSingleton<VariablesService>();
             services.AddSingleton<StorageService>();
             
             //WMs
@@ -75,14 +96,24 @@ namespace Postgirl
 
         private async Task InitializeApplicationAsync()
         {
-            var storage = AppHost.Services.GetRequiredService<StorageService>();
-            var history = AppHost.Services.GetRequiredService<HistoryService>();
-            var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
-            var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
+            var storageService = AppHost.Services.GetRequiredService<StorageService>();
+            var historyService = AppHost.Services.GetRequiredService<HistoryService>();
+            var savedService = AppHost.Services.GetRequiredService<SavedRequestService>();
+            var variablesService = AppHost.Services.GetRequiredService<VariablesService>();
 
-            var state = await storage.LoadAsync();
-            history.Import(state.History);
-            saved.Import(state.SavedRequests);
+            var state = await storageService.LoadAsync();
+
+            historyService.Import(state.History);
+            savedService.Import(state.SavedRequests);
+            variablesService.Import(state.Variables);
+
+            if (variablesService.Items.Count == 0)
+            {
+                variablesService.SeedDefaults();
+            }
+
+            // mainViewModel resolved AFTER all imports so VariablesViewModel initializes from populated service
+            var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
             // Import opened documents or add new empty document if none exist
             if (state.OpenedDocuments != null && state.OpenedDocuments.Count > 0)
@@ -94,6 +125,8 @@ namespace Postgirl
                 // If no saved documents, create a new empty one
                 mainViewModel.NewTabCommand.Execute(null);
             }
+
+            mainViewModel.ActiveSidebarPanel = state.ActiveSidebarPanel;
 
             var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
             mainWindow.Show();
