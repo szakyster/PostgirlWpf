@@ -62,7 +62,9 @@ public static class OpenedDocumentMapper
                 .ToList(),
             Parameters = entry.Parameters
                 .Select(p => p.Copy())
-                .ToList()
+                .ToList(),
+            AuthType = entry.AuthType,
+            BearerToken = entry.BearerToken
         };
 
         MapBodyToRequest(entry, model);

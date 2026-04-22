@@ -52,7 +52,9 @@ public static class SavedRequestMapper
             Headers = entry.Headers
                 .Select(h => h.Copy())
                 .ToList(),
-            Parameters = entry.Parameters.Select(p => p.Copy()).ToList()
+            Parameters = entry.Parameters.Select(p => p.Copy()).ToList(),
+            AuthType = entry.AuthType,
+            BearerToken = entry.BearerToken
         };
 
         MapBodyToRequest(entry, model);

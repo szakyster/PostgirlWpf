@@ -42,6 +42,7 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
                                   .Select(p => new RequestParameter(p.Key, Substitute(p.Value)) { IsEnabled = p.IsEnabled })
                                   .ToList(),
             Body            = SubstituteBody(original.Body),
+            AuthType        = original.AuthType,
             BearerToken     = Substitute(original.BearerToken),
             Timeout         = original.Timeout,
             FollowRedirects = original.FollowRedirects,

@@ -18,6 +18,8 @@ public static class HistoryMapper
             Url = entry.Url,
             Headers = MapHeaders(entry),
             Parameters = entry.Parameters == null ? [] : entry.Parameters.Select(p => p.Copy()).ToList(),
+            AuthType = entry.AuthType,
+            BearerToken = entry.BearerToken,
         };
 
         switch (entry.BodyType)

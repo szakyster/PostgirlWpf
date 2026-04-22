@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Postgirl.Domain.Authentication;
 using Postgirl.Domain.Http.Body;
 
 namespace Postgirl.Domain.Http;
@@ -14,6 +15,7 @@ public class HttpRequestModel
     public IList<RequestParameter> Parameters { get; set; } =[];
     public HttpBody Body { get; set; } = new TextBody();
 
+    public AuthType AuthType { get; set; }
     public string BearerToken { get; set; } = string.Empty;
 
     public TimeSpan? Timeout { get; set; }
