@@ -3,7 +3,8 @@
     public enum AuthType
     {
         None,
-        BearerToken
+        BearerToken,
+        WindowsAuthentication
     }
 
 }

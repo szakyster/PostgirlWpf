@@ -31,9 +31,8 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
 
     private HttpRequestModel ApplyTo(HttpRequestModel original)
     {
-        return new HttpRequestModel
+        return new HttpRequestModel(original)
         {
-            Method          = original.Method,
             Url             = Substitute(original.Url),
             Headers         = original.Headers
                                   .Select(h => new RequestHeader(h.Key, Substitute(h.Value), h.IsSystem) { IsEnabled = h.IsEnabled })
@@ -43,9 +42,6 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
                                   .ToList(),
             Body            = SubstituteBody(original.Body),
             BearerToken     = Substitute(original.BearerToken),
-            Timeout         = original.Timeout,
-            FollowRedirects = original.FollowRedirects,
-            IgnoreSslErrors = original.IgnoreSslErrors
         };
     }
 

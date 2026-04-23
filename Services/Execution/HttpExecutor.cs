@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Postgirl.Domain.Authentication;
 using Postgirl.Domain.Execution;
 using Postgirl.Domain.Http;
 
@@ -14,6 +15,10 @@ namespace Postgirl.Services.Execution;
 public class HttpExecutor : IHttpExecutor
 {
     private static readonly HttpClient Client = new();
+    private static readonly HttpClient WindowsAuthenticationClient = new(new HttpClientHandler
+    {
+        UseDefaultCredentials = true
+    });
 
     public async Task<HttpExecutionResult> ExecuteAsync(
         HttpRequestModel model,
@@ -24,8 +29,9 @@ public class HttpExecutor : IHttpExecutor
         try
         {
             using var request = BuildRequestMessage(model);
+            var client = GetHttpClient(model);
 
-            using var response = await Client.SendAsync(
+            using var response = await client.SendAsync(
                 request,
                 HttpCompletionOption.ResponseHeadersRead,
                 cancellationToken);
@@ -110,6 +116,11 @@ public class HttpExecutor : IHttpExecutor
 
         return request;
     }
+
+    private static HttpClient GetHttpClient(HttpRequestModel model)
+        => model.AuthType == AuthType.WindowsAuthentication
+            ? WindowsAuthenticationClient
+            : Client;
 
     private string BuildUrlWithParameters(string baseUrl, IList<RequestParameter> parameters)
     {

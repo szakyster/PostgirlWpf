@@ -57,6 +57,8 @@ public class RequestDocumentViewModel : BaseViewModel
         FormItems.CollectionChanged += (_, _) => SyncBodyToDomain();
         Auth = new RequestAuthViewModel();
         Auth.PropertyChanged += OnAuthChanged;
+        Auth.AuthType = _request.AuthType;
+        Auth.BearerToken = _request.BearerToken;
 
         SendButtonText = "Send";
     }
@@ -534,8 +536,9 @@ public class RequestDocumentViewModel : BaseViewModel
         if (e.PropertyName == nameof(RequestAuthViewModel.AuthType) ||
             e.PropertyName == nameof(RequestAuthViewModel.BearerToken))
         {
+            _request.AuthType = Auth.AuthType;
             SyncAuthorizationHeader();
-            _request.BearerToken = Auth.AuthType == AuthType.BearerToken ? Auth.BearerToken : null;
+            _request.BearerToken = Auth.AuthType == AuthType.BearerToken ? Auth.BearerToken : string.Empty;
         }
     }
 
