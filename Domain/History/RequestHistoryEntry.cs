@@ -1,6 +1,7 @@
 ﻿using Postgirl.Domain.Authentication;
 using Postgirl.Domain.Http;
 using Postgirl.Domain.Http.Body;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
@@ -23,6 +24,7 @@ namespace Postgirl.Domain.History
 
         public AuthType AuthType { get; set; }
         public string BearerToken { get; set; } = string.Empty;
+        public DateTimeOffset? ExecutedAt { get; set; }
 
         //response
         public int StatusCode { get; set; }
