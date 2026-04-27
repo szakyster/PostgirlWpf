@@ -21,6 +21,7 @@
 						<GroupStyle.HeaderTemplate>
 							<DataTemplate>
 								<TextBlock Text="{Binding Name}"
+								           Foreground="{StaticResource Brush.TextPrimary}"
 								           FontWeight="SemiBold"
 								           Margin="4,10,4,4"/>
 							</DataTemplate>
