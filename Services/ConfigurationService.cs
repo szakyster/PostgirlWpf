@@ -52,13 +52,42 @@ public class ConfigurationService
         var entry = GetTypedEntry(key, ConfigurationValueType.Boolean);
 
         if (bool.TryParse(entry.Value, out var value))
+        {
             return value;
+        }
 
         throw new InvalidOperationException($"Configuration entry '{key}' does not contain a valid boolean value.");
     }
 
     public int GetRetainedHistoryItemCount()
-        => GetInt(ConfigurationKeys.RetainedHistoryItemCount);
+    {
+        return GetInt(ConfigurationKeys.RetainedHistoryItemCount);
+    }
+
+    public bool GetHistoryGroupByDateEnabled()
+    {
+        return GetBool(ConfigurationKeys.HistoryGroupByDateEnabled);
+    }
+
+    public int GetHttpRequestTimeoutSeconds()
+    {
+        return GetInt(ConfigurationKeys.HttpRequestTimeoutSeconds);
+    }
+
+    public int GetHttpMaxResponseBodySizeKb()
+    {
+        return GetInt(ConfigurationKeys.HttpMaxResponseBodySizeKb);
+    }
+
+    public string GetHttpDefaultUserAgent()
+    {
+        return GetString(ConfigurationKeys.HttpDefaultUserAgent);
+    }
+
+    public bool GetStorageKeepHistoryBetweenSessions()
+    {
+        return GetBool(ConfigurationKeys.StorageKeepHistoryBetweenSessions);
+    }
 
     private ConfigurationEntry GetTypedEntry(string key, ConfigurationValueType expectedValueType)
     {
@@ -81,6 +110,41 @@ public class ConfigurationService
                 DisplayName = "Retained history item count",
                 ValueType = ConfigurationValueType.Integer,
                 Value = "100"
+            },
+            new ConfigurationEntry
+            {
+                Key = ConfigurationKeys.HistoryGroupByDateEnabled,
+                DisplayName = "Group history by date",
+                ValueType = ConfigurationValueType.Boolean,
+                Value = "true"
+            },
+            new ConfigurationEntry
+            {
+                Key = ConfigurationKeys.HttpRequestTimeoutSeconds,
+                DisplayName = "HTTP request timeout in seconds",
+                ValueType = ConfigurationValueType.Integer,
+                Value = "30"
+            },
+            new ConfigurationEntry
+            {
+                Key = ConfigurationKeys.HttpMaxResponseBodySizeKb,
+                DisplayName = "Maximum HTTP response body size in KB",
+                ValueType = ConfigurationValueType.Integer,
+                Value = "1024"
+            },
+            new ConfigurationEntry
+            {
+                Key = ConfigurationKeys.HttpDefaultUserAgent,
+                DisplayName = "Default HTTP User-Agent",
+                ValueType = ConfigurationValueType.String,
+                Value = "Postgirl/1.0"
+            },
+            new ConfigurationEntry
+            {
+                Key = ConfigurationKeys.StorageKeepHistoryBetweenSessions,
+                DisplayName = "Keep history between sessions",
+                ValueType = ConfigurationValueType.Boolean,
+                Value = "true"
             }
         ];
     }
