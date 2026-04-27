@@ -82,6 +82,7 @@ namespace Postgirl
                 return pipeline;
             });
             services.AddSingleton<IHttpExecutor>(sp => sp.GetRequiredService<IHttpPipeline>());
+            services.AddSingleton<ConfigurationService>();
             services.AddSingleton<HistoryService>();
             services.AddSingleton<SavedRequestService>();
             services.AddSingleton<VariablesService>();

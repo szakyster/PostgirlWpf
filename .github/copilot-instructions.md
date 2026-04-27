@@ -1,4 +1,5 @@
 # Copilot Instructions
+- Act as a senior .NET 8 WPF/MVVM engineer.
 
 ## Project Guidelines
 - The user prefers English group labels in the history UI.
