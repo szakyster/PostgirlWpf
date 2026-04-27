@@ -13,10 +13,12 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
     public string Name => "VariableSubstitution";
     public int Order => PipelineOrder.VariableSubstitution;
 
+    private readonly ConfigurationService _configurationService;
     private readonly VariablesService _variablesService;
 
-    public VariableSubstitutionStep(VariablesService variablesService)
+    public VariableSubstitutionStep(ConfigurationService configurationService, VariablesService variablesService)
     {
+        _configurationService = configurationService;
         _variablesService = variablesService;
     }
 
@@ -25,7 +27,11 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
         Func<Task> next,
         CancellationToken cancellationToken = default)
     {
-        context.Request = ApplyTo(context.Request);
+        if (_configurationService.GetVariablesEnabled())
+        {
+            context.Request = ApplyTo(context.Request);
+        }
+
         return next();
     }
 

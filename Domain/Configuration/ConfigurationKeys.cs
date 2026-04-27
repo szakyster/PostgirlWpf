@@ -7,5 +7,6 @@ public static class ConfigurationKeys
     public const string HttpRequestTimeoutSeconds = "http.requestTimeoutSeconds";
     public const string HttpMaxResponseBodySizeKb = "http.maxResponseBodySizeKb";
     public const string HttpDefaultUserAgent = "http.defaultUserAgent";
+    public const string VariablesEnabled = "variables.enabled";
     public const string StorageKeepHistoryBetweenSessions = "storage.keepHistoryBetweenSessions";
 }

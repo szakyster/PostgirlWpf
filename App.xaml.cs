@@ -79,7 +79,9 @@ namespace Postgirl
             services.AddSingleton<IHttpPipeline>(sp =>
             {
                 var pipeline = new HttpPipeline(sp.GetRequiredService<HttpExecutor>());
-                pipeline.Register(new VariableSubstitutionStep(sp.GetRequiredService<VariablesService>()));
+                pipeline.Register(new VariableSubstitutionStep(
+                    sp.GetRequiredService<ConfigurationService>(),
+                    sp.GetRequiredService<VariablesService>()));
                 return pipeline;
             });
             services.AddSingleton<IHttpExecutor>(sp => sp.GetRequiredService<IHttpPipeline>());

@@ -84,6 +84,11 @@ public class ConfigurationService
         return GetString(ConfigurationKeys.HttpDefaultUserAgent);
     }
 
+    public bool GetVariablesEnabled()
+    {
+        return GetBool(ConfigurationKeys.VariablesEnabled);
+    }
+
     public bool GetStorageKeepHistoryBetweenSessions()
     {
         return GetBool(ConfigurationKeys.StorageKeepHistoryBetweenSessions);
@@ -138,6 +143,13 @@ public class ConfigurationService
                 DisplayName = "Default HTTP User-Agent",
                 ValueType = ConfigurationValueType.String,
                 Value = "Postgirl/1.0"
+            },
+            new ConfigurationEntry
+            {
+                Key = ConfigurationKeys.VariablesEnabled,
+                DisplayName = "Enable variable handling",
+                ValueType = ConfigurationValueType.Boolean,
+                Value = "true"
             },
             new ConfigurationEntry
             {
