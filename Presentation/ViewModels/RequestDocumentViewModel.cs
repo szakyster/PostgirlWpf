@@ -427,6 +427,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
                 AuthType = Auth.AuthType,
                 BearerToken = Auth.BearerToken,
+                ExecutedAt = DateTimeOffset.Now,
 
                 ResponseBody = _response.Body ?? string.Empty,
                 ResponseHeaders = ResponseHeaders.ToList(),

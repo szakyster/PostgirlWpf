@@ -17,7 +17,7 @@ public class HistoryService
 
     public List<RequestHistoryEntry> Export()
     {
-        return Items.ToList();
+        return Items.Take(100).ToList();
     }
 
     public void Import(IEnumerable<RequestHistoryEntry> entries)
