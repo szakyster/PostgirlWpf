@@ -6,6 +6,10 @@
 		Icon="/Assets/postgirl.ico"
 		Background="{StaticResource Brush.Background}">
 
+	<Window.Resources>
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+	</Window.Resources>
+
 	<Window.Title>
 		<MultiBinding StringFormat="Postgirl - {0}">
 			<Binding Path="AppVersion"/>
@@ -127,6 +131,7 @@
 							<!-- Variables -->
 								<Expander x:Name="VariablesExpander"
 										  Header="Variables"
+										  Visibility="{Binding IsVariablesPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
 										  IsExpanded="False"
 										  Expanded="Expander_Expanded">
 

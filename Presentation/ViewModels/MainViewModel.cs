@@ -27,7 +27,25 @@ public class MainViewModel : BaseViewModel
     public ObservableCollection<SavedRequestEntry> SavedRequests
         => _savedRequestService.Items;
 
-    public string ActiveSidebarPanel { get; set; } = "SavedExpander";
+    private string _activeSidebarPanel = "SavedExpander";
+
+    public string ActiveSidebarPanel
+    {
+        get => _activeSidebarPanel;
+        set
+        {
+            var panel = value;
+
+            if (!IsVariablesPanelVisible && string.Equals(value, "VariablesExpander", StringComparison.Ordinal))
+            {
+                panel = "SavedExpander";
+            }
+
+            SetProperty(ref _activeSidebarPanel, panel);
+        }
+    }
+
+    public bool IsVariablesPanelVisible { get; }
 
     public string AppVersion
     {
@@ -38,13 +56,20 @@ public class MainViewModel : BaseViewModel
         }
     }
 
-    public MainViewModel(IHttpExecutor httpExecutor, HistoryService historyService, StorageService storageService, SavedRequestService savedRequestService, VariablesService variablesService)
+    public MainViewModel(
+        IHttpExecutor httpExecutor,
+        HistoryService historyService,
+        StorageService storageService,
+        SavedRequestService savedRequestService,
+        VariablesService variablesService,
+        ConfigurationService configurationService)
     {
         _storageService = storageService;
         _savedRequestService = savedRequestService;
         _variablesService = variablesService;
         _httpExecutor = httpExecutor;
         _historyService = historyService;
+        IsVariablesPanelVisible = configurationService.GetVariablesEnabled();
 
         HistoryViewModel = new HistoryViewModel(historyService, this);
         VariablesViewModel = new VariablesViewModel(variablesService);

@@ -44,13 +44,14 @@ namespace Postgirl
             var history = AppHost.Services.GetRequiredService<HistoryService>();
             var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
             var variables = AppHost.Services.GetRequiredService<VariablesService>();
+            var configuration = AppHost.Services.GetRequiredService<ConfigurationService>();
             var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
             try
             {
                 var state = new AppState
                 {
-                    History = history.Export(),
+                    History = configuration.GetStorageKeepHistoryBetweenSessions() ? history.Export() : [],
                     SavedRequests = saved.Export(),
                     Variables = variables.Export(),
                     OpenedDocuments = mainViewModel.ExportOpenedDocuments(),
@@ -78,10 +79,13 @@ namespace Postgirl
             services.AddSingleton<IHttpPipeline>(sp =>
             {
                 var pipeline = new HttpPipeline(sp.GetRequiredService<HttpExecutor>());
-                pipeline.Register(new VariableSubstitutionStep(sp.GetRequiredService<VariablesService>()));
+                pipeline.Register(new VariableSubstitutionStep(
+                    sp.GetRequiredService<ConfigurationService>(),
+                    sp.GetRequiredService<VariablesService>()));
                 return pipeline;
             });
             services.AddSingleton<IHttpExecutor>(sp => sp.GetRequiredService<IHttpPipeline>());
+            services.AddSingleton<ConfigurationService>();
             services.AddSingleton<HistoryService>();
             services.AddSingleton<SavedRequestService>();
             services.AddSingleton<VariablesService>();
@@ -100,10 +104,15 @@ namespace Postgirl
             var historyService = AppHost.Services.GetRequiredService<HistoryService>();
             var savedService = AppHost.Services.GetRequiredService<SavedRequestService>();
             var variablesService = AppHost.Services.GetRequiredService<VariablesService>();
+            var configurationService = AppHost.Services.GetRequiredService<ConfigurationService>();
 
             var state = await storageService.LoadAsync();
 
-            historyService.Import(state.History);
+            if (configurationService.GetStorageKeepHistoryBetweenSessions())
+            {
+                historyService.Import(state.History);
+            }
+
             savedService.Import(state.SavedRequests);
             variablesService.Import(state.Variables);
 

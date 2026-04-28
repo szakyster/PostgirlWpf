@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Microsoft.Extensions.DependencyInjection;
+using Postgirl.Domain.Configuration;
 using Postgirl.Services;
 
 namespace Postgirl.Presentation.Controls;
@@ -22,6 +23,7 @@ public class VariableAwareTextBox : Control
     private const double SingleLinePageWidth = 100_000;
 
     private VariablesService? _variablesService;
+    private ConfigurationService? _configurationService;
     private RichTextBox? _editor;
     private bool _isUpdating;
     private int _savedCaretOffset;
@@ -98,10 +100,19 @@ public class VariableAwareTextBox : Control
 
     private void ApplySingleLineConstraint()
     {
-        if (_editor == null) return;
+        if (_editor == null)
+        {
+            return;
+        }
+
         _editor.Document.PageWidth = AcceptsReturn
             ? double.NaN
             : SingleLinePageWidth;
+    }
+
+    private bool AreVariablesEnabled()
+    {
+        return _configurationService?.GetVariablesEnabled() ?? true;
     }
 
     public override void OnApplyTemplate()
@@ -115,12 +126,17 @@ public class VariableAwareTextBox : Control
         }
 
         if (_variablesService != null)
+        {
             _variablesService.Items.CollectionChanged -= OnVariablesChanged;
+        }
 
         _variablesService = App.AppHost?.Services.GetService<VariablesService>();
+        _configurationService = App.AppHost?.Services.GetService<ConfigurationService>();
 
         if (_variablesService != null)
+        {
             _variablesService.Items.CollectionChanged += OnVariablesChanged;
+        }
 
         _editor = GetTemplateChild(PartEditor) as RichTextBox;
 
@@ -129,9 +145,14 @@ public class VariableAwareTextBox : Control
             _editor.Document.PagePadding = new Thickness(0);
             _editor.IsReadOnly = IsReadOnly;
             _editor.AcceptsReturn = AcceptsReturn;
-            _editor.ContextMenu = new ContextMenu();
+            _editor.ContextMenu = AreVariablesEnabled() ? new ContextMenu() : null;
             ApplySingleLineConstraint();
-            _editor.ContextMenuOpening += OnContextMenuOpening;
+
+            if (AreVariablesEnabled())
+            {
+                _editor.ContextMenuOpening += OnContextMenuOpening;
+            }
+
             _editor.TextChanged += OnEditorTextChanged;
             RebuildDocument();
         }
@@ -162,7 +183,10 @@ public class VariableAwareTextBox : Control
 
     private void RebuildDocument()
     {
-        if (_editor == null) return;
+        if (_editor == null)
+        {
+            return;
+        }
 
         _editor.TextChanged -= OnEditorTextChanged;
         try
@@ -214,17 +238,27 @@ public class VariableAwareTextBox : Control
 
     private int GetCaretOffset()
     {
-        if (_editor == null) return 0;
+        if (_editor == null)
+        {
+            return 0;
+        }
+
         return new TextRange(_editor.Document.ContentStart, _editor.CaretPosition).Text.Length;
     }
 
     private void RestoreCaretOffset(int offset)
     {
-        if (_editor == null) return;
+        if (_editor == null)
+        {
+            return;
+        }
 
         foreach (var block in _editor.Document.Blocks)
         {
-            if (block is not Paragraph paragraph) continue;
+            if (block is not Paragraph paragraph)
+            {
+                continue;
+            }
 
             var paraLength = new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text.Length;
 
@@ -266,6 +300,12 @@ public class VariableAwareTextBox : Control
 
     private void OnContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
+        if (!AreVariablesEnabled())
+        {
+            e.Handled = true;
+            return;
+        }
+
         _savedCaretOffset = GetCaretOffset();
 
         var menu = _editor!.ContextMenu!;
@@ -289,7 +329,9 @@ public class VariableAwareTextBox : Control
     }
 
     private void OnVariablesChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        => RebuildDocument();
+    {
+        RebuildDocument();
+    }
 
     private Brush GetVariableBrush(string variableName)
     {
