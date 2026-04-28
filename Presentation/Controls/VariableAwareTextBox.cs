@@ -112,7 +112,7 @@ public class VariableAwareTextBox : Control
 
     private bool AreVariablesEnabled()
     {
-        return _configurationService?.GetBool(ConfigurationKeys.VariablesEnabled) ?? true;
+        return _configurationService?.GetVariablesEnabled() ?? true;
     }
 
     public override void OnApplyTemplate()
