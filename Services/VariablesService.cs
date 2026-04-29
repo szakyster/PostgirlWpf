@@ -1,8 +1,8 @@
+using Postgirl.Domain.Variables;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Postgirl.Domain.Variables;
 
 namespace Postgirl.Services;
 

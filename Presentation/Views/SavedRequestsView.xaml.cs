@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace Postgirl.Presentation.Views
 {
-    public partial class SavedRequestsView: UserControl
+    public partial class SavedRequestsView : UserControl
     {
         public SavedRequestsView()
         {

@@ -1,14 +1,15 @@
-using System;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Postgirl.Domain.Persistence;
 using Postgirl.Presentation.ViewModels;
 using Postgirl.Presentation.Views;
 using Postgirl.Services;
+using System.Collections.Generic;
 using Postgirl.Services.Execution;
 using Postgirl.Services.Execution.Steps;
+using System;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Postgirl
 {
@@ -31,9 +32,9 @@ namespace Postgirl
             }
             catch (Exception)
             {
-                    // If initialization fails, we still want to show the main window so the user can see the error message
-                    var mainWindow = new MainWindow(null);
-                    mainWindow.Show();
+                // If initialization fails, we still want to show the main window so the user can see the error message
+                var mainWindow = new MainWindow(null);
+                mainWindow.Show();
             }
         }
 
@@ -91,7 +92,7 @@ namespace Postgirl
             services.AddSingleton<SavedRequestService>();
             services.AddSingleton<VariablesService>();
             services.AddSingleton<StorageService>();
-            
+
             //WMs
             services.AddSingleton<MainViewModel>();
 

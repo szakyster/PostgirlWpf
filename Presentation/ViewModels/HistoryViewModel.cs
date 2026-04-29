@@ -1,17 +1,17 @@
 ﻿using Postgirl.Common;
-using System.Collections.ObjectModel;
 using Postgirl.Domain.History;
 using Postgirl.Services;
+using System.Collections.ObjectModel;
 
 namespace Postgirl.Presentation.ViewModels
 {
-    public class HistoryViewModel (HistoryService _historyService, MainViewModel mainViewModel) : BaseViewModel
+    public class HistoryViewModel(HistoryService _historyService, MainViewModel mainViewModel) : BaseViewModel
     {
 
         public ObservableCollection<RequestHistoryEntry> HistoryItems
             => _historyService.Items;
 
-        #nullable enable
+#nullable enable
         public RequestHistoryEntry? SelectedHistoryItem { get; set; }
 
         public void OpenSelectedHistoryItem()

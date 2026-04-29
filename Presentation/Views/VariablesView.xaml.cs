@@ -1,6 +1,6 @@
+using Postgirl.Presentation.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using Postgirl.Presentation.ViewModels;
 
 namespace Postgirl.Presentation.Views;
 

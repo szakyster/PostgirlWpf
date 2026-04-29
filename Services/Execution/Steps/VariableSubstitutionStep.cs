@@ -1,10 +1,9 @@
+using Postgirl.Domain.Http;
+using Postgirl.Domain.Http.Body;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Postgirl.Domain.Http;
-using Postgirl.Domain.Http.Body;
-using Postgirl.Services;
 
 namespace Postgirl.Services.Execution.Steps;
 
@@ -39,15 +38,15 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
     {
         return new HttpRequestModel(original)
         {
-            Url             = Substitute(original.Url),
-            Headers         = original.Headers
+            Url = Substitute(original.Url),
+            Headers = original.Headers
                                   .Select(h => new RequestHeader(h.Key, Substitute(h.Value), h.IsSystem) { IsEnabled = h.IsEnabled })
                                   .ToList(),
-            Parameters      = original.Parameters
+            Parameters = original.Parameters
                                   .Select(p => new RequestParameter(p.Key, Substitute(p.Value)) { IsEnabled = p.IsEnabled })
                                   .ToList(),
-            Body            = SubstituteBody(original.Body),
-            BearerToken     = Substitute(original.BearerToken),
+            Body = SubstituteBody(original.Body),
+            BearerToken = Substitute(original.BearerToken),
         };
     }
 
@@ -55,7 +54,7 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
     {
         TextBody text => new TextBody
         {
-            Content     = Substitute(text.Content),
+            Content = Substitute(text.Content),
             ContentType = text.ContentType
         },
         JsonBody json => new JsonBody

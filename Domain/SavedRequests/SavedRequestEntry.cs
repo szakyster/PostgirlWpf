@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using Postgirl.Domain.Authentication;
+﻿using Postgirl.Domain.Authentication;
 using Postgirl.Domain.Http;
 using Postgirl.Domain.Http.Body;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Postgirl.Domain.SavedRequests;
 

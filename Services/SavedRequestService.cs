@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Postgirl.Domain.SavedRequests;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Postgirl.Domain.SavedRequests;
 
 namespace Postgirl.Services;
 

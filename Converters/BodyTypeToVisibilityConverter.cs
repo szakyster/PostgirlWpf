@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Postgirl.Domain.Http.Body;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using Postgirl.Domain.Http.Body;
 
 namespace Postgirl.Converters;
 

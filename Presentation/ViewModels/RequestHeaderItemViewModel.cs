@@ -12,7 +12,7 @@ namespace Postgirl.Presentation.ViewModels
 
         public RequestHeaderItemViewModel(RequestHeader header, Action<RequestHeaderItemViewModel> removeCallback)
         {
-            _header = header; 
+            _header = header;
             _removeCallback = removeCallback;
 
             RemoveCommand = new RelayCommand(Remove, CanRemove);
@@ -20,7 +20,8 @@ namespace Postgirl.Presentation.ViewModels
 
         public ICommand RemoveCommand { get; }
 
-        public string Key {
+        public string Key
+        {
             get => _header.Key;
             set
             {
@@ -48,7 +49,7 @@ namespace Postgirl.Presentation.ViewModels
         public bool IsSystem => _header.IsSystem;
 
         public bool CanEdit => !_header.IsSystem;
-        
+
         public bool IsUser => !_header.IsSystem;
 
         public bool IsEnabled
