@@ -4,6 +4,7 @@ public class ConfigurationEntry
 {
     public string Key { get; init; } = string.Empty;
     public string DisplayName { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
     public ConfigurationValueType ValueType { get; init; }
     public string Value { get; set; } = string.Empty;
 }

@@ -33,7 +33,7 @@ namespace Postgirl
             catch (Exception)
             {
                 // If initialization fails, we still want to show the main window so the user can see the error message
-                var mainWindow = new MainWindow(null);
+                var mainWindow = new MainWindow(null, null);
                 mainWindow.Show();
             }
         }

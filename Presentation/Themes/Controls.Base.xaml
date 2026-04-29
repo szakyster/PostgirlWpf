@@ -1,7 +1,9 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:Postgirl.Presentation.Controls">
+    xmlns:behaviors="clr-namespace:Postgirl.Presentation.Behaviors"
+    xmlns:controls="clr-namespace:Postgirl.Presentation.Controls"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework">
 
     <!-- ========================= -->
     <!-- GLOBAL TEXT DEFAULTS      -->
@@ -18,6 +20,74 @@
         <Setter Property="BorderBrush"
                 Value="{StaticResource Brush.Border}" />
     </Style>
+
+	<Style x:Key="DialogWindowStyle"
+	       TargetType="Window">
+		<Setter Property="WindowStyle"
+		        Value="None" />
+		<Setter Property="ResizeMode"
+		        Value="CanResize" />
+		<Setter Property="Background"
+		        Value="{StaticResource Brush.Background}" />
+		<Setter Property="ShowInTaskbar"
+		        Value="False" />
+		<Setter Property="shell:WindowChrome.WindowChrome">
+			<Setter.Value>
+				<shell:WindowChrome CaptionHeight="0"
+				                    ResizeBorderThickness="6"
+				                    CornerRadius="0"
+				                    GlassFrameThickness="0"
+				                    UseAeroCaptionButtons="False" />
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="Window">
+					<Border Background="{TemplateBinding Background}"
+					        BorderBrush="{StaticResource Brush.Border}"
+					        BorderThickness="1">
+						<DockPanel>
+							<Border DockPanel.Dock="Top"
+							        Background="{StaticResource Brush.SurfaceElevated}"
+							        BorderBrush="{StaticResource Brush.Border}"
+							        BorderThickness="0,0,0,1">
+								<Grid Height="44">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="*" />
+										<ColumnDefinition Width="Auto" />
+									</Grid.ColumnDefinitions>
+
+									<Border Grid.Column="0"
+									        Background="Transparent"
+									        behaviors:WindowChromeBehavior.IsDragRegion="True">
+										<TextBlock Text="{TemplateBinding Title}"
+										           FontSize="15"
+										           FontWeight="SemiBold"
+										           Foreground="{StaticResource Brush.TextPrimary}"
+										           VerticalAlignment="Center"
+										           Margin="16,0,0,0" />
+									</Border>
+
+									<Button Grid.Column="1"
+									        Content="✕"
+									        Width="44"
+									        Height="44"
+									        Style="{DynamicResource GhostButtonStyle}"
+									        FontSize="14"
+									        Foreground="{StaticResource Brush.TextPrimary}"
+									        behaviors:WindowChromeBehavior.IsCloseButton="True" />
+								</Grid>
+							</Border>
+
+							<AdornerDecorator>
+								<ContentPresenter />
+							</AdornerDecorator>
+						</DockPanel>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
 	<!-- ========================= -->
 	<!-- TEXTBOX BASE STYLE        -->

@@ -263,7 +263,7 @@ public class RequestDocumentViewModel : BaseViewModel
     {
         get
         {
-            var body = _response.Body;
+            var body = _response?.Body;
             if (body is not null && IsJsonContentType(_response.ContentType))
                 return FormatJson(body);
             return body;
