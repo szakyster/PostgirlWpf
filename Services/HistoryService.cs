@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Postgirl.Domain.History;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Postgirl.Domain.History;
 
 namespace Postgirl.Services;
 

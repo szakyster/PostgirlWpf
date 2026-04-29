@@ -1,4 +1,6 @@
 #nullable enable
+using Microsoft.Extensions.DependencyInjection;
+using Postgirl.Services;
 using System;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
@@ -6,9 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Microsoft.Extensions.DependencyInjection;
-using Postgirl.Domain.Configuration;
-using Postgirl.Services;
 
 namespace Postgirl.Presentation.Controls;
 

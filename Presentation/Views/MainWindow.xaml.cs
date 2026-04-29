@@ -1,7 +1,6 @@
+using Postgirl.Presentation.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using Postgirl.Presentation.ViewModels;
-using Postgirl.Services;
 
 namespace Postgirl.Presentation.Views
 {
@@ -11,7 +10,7 @@ namespace Postgirl.Presentation.Views
 
         public MainWindow(MainViewModel vm)
         {
-            InitializeComponent(); 
+            InitializeComponent();
             DataContext = vm;
             Closing += OnClosing;
             Loaded += OnLoaded;

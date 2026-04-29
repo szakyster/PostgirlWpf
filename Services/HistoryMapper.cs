@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Postgirl.Domain.History;
 using Postgirl.Domain.Http;
-using Postgirl.Domain.History;
 using Postgirl.Domain.Http.Body;
-using Postgirl.Domain.SavedRequests;
 using Postgirl.Presentation.ViewModels.Authentication;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Postgirl.Services;
 
@@ -110,7 +109,7 @@ public static class HistoryMapper
         }
 
     }
- 
+
     // =========================
     // SAVED ENTRY -> AUTH VM
     // =========================

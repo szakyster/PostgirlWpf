@@ -64,9 +64,12 @@ function Get-ChangeSummary {
     return [pscustomobject]$summary
 }
 
-Write-Host 'Building project...'
+Write-Host 'Formatting project...'
 
 try {
+    Invoke-NativeCommand -Command { dotnet format .\Postgirl.csproj } -ErrorMessage 'Formatting failed. Review the command output above for details.'
+
+    Write-Host 'Building project...'
     Invoke-NativeCommand -Command { dotnet build .\Postgirl.csproj --nologo } -ErrorMessage 'Build failed. Review the compiler errors above for file and line details.'
 
     $changeSummary = Get-ChangeSummary

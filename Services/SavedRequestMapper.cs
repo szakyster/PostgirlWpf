@@ -14,7 +14,7 @@ public static class SavedRequestMapper
     // =========================
     public static SavedRequestEntry FromViewModel(RequestDocumentViewModel vm)
     {
-        var request = vm.Domain; 
+        var request = vm.Domain;
 
         var entry = new SavedRequestEntry
         {
@@ -144,7 +144,7 @@ public static class SavedRequestMapper
                 break;
 
             default:
-                model.Body = new TextBody { Content= "" };
+                model.Body = new TextBody { Content = "" };
                 break;
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Postgirl.Presentation.Views.RequestDocument.Parts
 {
-    public partial class StatusBarView: UserControl
+    public partial class StatusBarView : UserControl
     {
         public StatusBarView()
         {

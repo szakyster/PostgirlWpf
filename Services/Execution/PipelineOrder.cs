@@ -4,6 +4,6 @@ namespace Postgirl.Services.Execution;
 public static class PipelineOrder
 {
     public const int VariableSubstitution = 10;
-    public const int PreRequestScript     = 50;
-    public const int PostResponseScript   = 100;
+    public const int PreRequestScript = 50;
+    public const int PostResponseScript = 100;
 }

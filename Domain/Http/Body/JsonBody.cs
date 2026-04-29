@@ -11,7 +11,7 @@ public class JsonBody : HttpBody
     public override HttpContent ToHttpContent()
     {
         if (string.IsNullOrWhiteSpace(Json))
-        { 
+        {
             return new StringContent(string.Empty, Encoding.UTF8, "application/json");
         }
         return new StringContent(Json, Encoding.UTF8, "application/json");

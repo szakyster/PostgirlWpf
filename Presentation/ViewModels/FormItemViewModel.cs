@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Input;
-using Postgirl.Common;
+﻿using Postgirl.Common;
 using Postgirl.Domain.Http.Body;
+using System;
+using System.Windows.Input;
 
 namespace Postgirl.Presentation.ViewModels;
 

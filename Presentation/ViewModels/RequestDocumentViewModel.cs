@@ -1,4 +1,12 @@
-﻿using System;
+﻿using Postgirl.Common;
+using Postgirl.Domain.Authentication;
+using Postgirl.Domain.History;
+using Postgirl.Domain.Http;
+using Postgirl.Domain.Http.Body;
+using Postgirl.Presentation.ViewModels.Authentication;
+using Postgirl.Services;
+using Postgirl.Services.Execution;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,14 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using Postgirl.Common;
-using Postgirl.Domain.Authentication;
-using Postgirl.Domain.History;
-using Postgirl.Domain.Http;
-using Postgirl.Domain.Http.Body;
-using Postgirl.Presentation.ViewModels.Authentication;
-using Postgirl.Services;
-using Postgirl.Services.Execution;
 
 namespace Postgirl.Presentation.ViewModels;
 
@@ -126,7 +126,7 @@ public class RequestDocumentViewModel : BaseViewModel
                 SyncBodyToDomain();
                 UpdateSystemHeaders();
             }
-                
+
         }
     }
 
@@ -141,7 +141,7 @@ public class RequestDocumentViewModel : BaseViewModel
                 SyncBodyToDomain();
                 UpdateSystemHeaders();
             }
-                
+
         }
     }
 
@@ -289,7 +289,8 @@ public class RequestDocumentViewModel : BaseViewModel
     public long ElapsedMilliseconds
     {
         get => _response?.ElapsedMilliseconds ?? 0;
-        set {
+        set
+        {
             if (_response != null && _response.ElapsedMilliseconds != value)
             {
                 _response.ElapsedMilliseconds = value;
@@ -299,7 +300,7 @@ public class RequestDocumentViewModel : BaseViewModel
     }
 
     public long ResponseSize => _response?.ResponseSize ?? 0;
-    
+
     public Brush StatusColor => SelectStatusColor(_response?.StatusCode);
 
     #endregion
@@ -549,9 +550,9 @@ public class RequestDocumentViewModel : BaseViewModel
         // --- NO AUTH ---
         if (Auth.AuthType != AuthType.BearerToken || string.IsNullOrWhiteSpace(Auth.BearerToken))
         {
-                if (existing != null)
-                    RemoveHeader(existing);
-                return;
+            if (existing != null)
+                RemoveHeader(existing);
+            return;
         }
 
         // --- BEARER TOKEN ---

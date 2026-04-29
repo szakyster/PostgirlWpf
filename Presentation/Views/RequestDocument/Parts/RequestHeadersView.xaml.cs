@@ -2,7 +2,7 @@
 
 namespace Postgirl.Presentation.Views.RequestDocument.Parts
 {
-    public partial class RequestHeadersView: UserControl
+    public partial class RequestHeadersView : UserControl
     {
         public RequestHeadersView()
         {
@@ -10,4 +10,3 @@ namespace Postgirl.Presentation.Views.RequestDocument.Parts
         }
     }
 }
-    
