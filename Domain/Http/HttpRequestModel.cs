@@ -43,7 +43,7 @@ public class HttpRequestModel
     public bool FollowRedirects { get; set; } = true;
     public bool IgnoreSslErrors { get; set; }
 
-    private static HttpBody CloneBody(HttpBody? body) => body switch
+    private static HttpBody CloneBody(HttpBody body) => body switch
     {
         TextBody text => new TextBody
         {

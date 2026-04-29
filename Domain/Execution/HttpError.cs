@@ -8,7 +8,7 @@ public class HttpError
 {
     public HttpErrorType Type { get; init; }
     public string Message { get; init; } = "";
-    public string? Details { get; init; }
+    public string Details { get; init; } = "";
 
     public static HttpError FromException(Exception ex)
     {
@@ -24,13 +24,14 @@ public class HttpError
             {
                 Type = HttpErrorType.Network,
                 Message = httpEx.Message,
-                Details = httpEx.InnerException?.Message
+                Details = httpEx.InnerException?.Message ?? ""
             },
 
             _ => new HttpError
             {
                 Type = HttpErrorType.Unknown,
-                Message = ex.Message
+                Message = ex.Message,
+                Details = ex.InnerException?.Message ?? string.Empty
             }
         };
     }

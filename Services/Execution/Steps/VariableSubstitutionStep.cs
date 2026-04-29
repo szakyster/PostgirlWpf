@@ -51,7 +51,7 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
         };
     }
 
-    private HttpBody SubstituteBody(HttpBody? body) => body switch
+    private HttpBody SubstituteBody(HttpBody body) => body switch
     {
         TextBody text => new TextBody
         {
@@ -71,5 +71,5 @@ public sealed class VariableSubstitutionStep : IHttpPipelineStep
         _ => body ?? new TextBody()
     };
 
-    private string Substitute(string? input) => _variablesService.Substitute(input);
+    private string Substitute(string input) => _variablesService.Substitute(input);
 }

@@ -106,7 +106,7 @@ public class ConfigurationService
             .ToList();
     }
 
-    public void Import(IEnumerable<ConfigurationStateEntry>? entries)
+    public void Import(IEnumerable<ConfigurationStateEntry> entries)
     {
         if (entries == null)
         {

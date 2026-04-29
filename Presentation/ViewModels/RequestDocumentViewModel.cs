@@ -263,8 +263,8 @@ public class RequestDocumentViewModel : BaseViewModel
     {
         get
         {
-            var body = _response?.Body;
-            if (body is not null && IsJsonContentType(_response?.ContentType))
+            var body = _response.Body;
+            if (body is not null && IsJsonContentType(_response.ContentType))
                 return FormatJson(body);
             return body;
         }
@@ -591,7 +591,7 @@ public class RequestDocumentViewModel : BaseViewModel
         _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
     }
 
-    private static bool IsJsonContentType(string? mediaType)
+    private static bool IsJsonContentType(string mediaType)
     {
         if (string.IsNullOrWhiteSpace(mediaType))
             return false;

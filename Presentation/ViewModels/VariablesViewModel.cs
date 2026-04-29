@@ -48,7 +48,7 @@ public class VariablesViewModel : BaseViewModel
         Items.Add(vm);
     }
 
-    private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
         {
@@ -70,7 +70,7 @@ public class VariablesViewModel : BaseViewModel
         RefreshDuplicates();
     }
 
-    private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnItemPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(VariableItemViewModel.Key))
         {

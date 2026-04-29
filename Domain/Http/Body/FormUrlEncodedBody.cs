@@ -9,7 +9,7 @@ public class FormUrlEncodedBody : HttpBody
     public override BodyType Type => BodyType.FormUrlEncoded;
     public IList<FormUrlEncodedItem> Items { get; set; } = new List<FormUrlEncodedItem>();
 
-    public override HttpContent? ToHttpContent()
+    public override HttpContent ToHttpContent()
     {
         var validItems = Items
             .Where(i => !string.IsNullOrWhiteSpace(i.Key))
