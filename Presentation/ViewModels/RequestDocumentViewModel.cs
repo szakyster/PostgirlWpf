@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Postgirl.Common;
@@ -30,6 +29,7 @@ public class RequestDocumentViewModel : BaseViewModel
     private HttpResponseResult _response;
     private CancellationTokenSource _cancellationTokenSource;
 
+    private static readonly JsonSerializerOptions _formattingOptions = new() { WriteIndented = true };
 
     public RequestDocumentViewModel(IHttpExecutor httpExecutor, HistoryService historyService, SavedRequestService savedRequestService, HttpRequestModel request, HttpResponseResult response = null)
     {
@@ -304,7 +304,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
     #endregion
 
-    private Brush SelectStatusColor(int? statusCode) =>
+    private static SolidColorBrush SelectStatusColor(int? statusCode) =>
         statusCode switch
         {
             >= 200 and < 300 => Brushes.LightGreen,
@@ -313,7 +313,7 @@ public class RequestDocumentViewModel : BaseViewModel
             _ => Brushes.Gray
         };
 
-    private string SelectStatusName(int? statusCode) =>
+    private static string SelectStatusName(int? statusCode) =>
         statusCode switch
         {
             >= 200 and < 300 => "OK",
@@ -382,11 +382,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
             SyncToDomain();
             var executionResult = await _httpExecutor.ExecuteAsync(_request, _cancellationTokenSource.Token);
-
-            if (_cancellationTokenSource.Token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException();
-            }
+            _cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
             if (executionResult.IsSuccess)
             {
@@ -398,7 +394,7 @@ public class RequestDocumentViewModel : BaseViewModel
                 {
                     StatusCode = 0,
                     Body = executionResult.Error?.Message ?? "Unknown error",
-                    Headers = new List<string>(),
+                    Headers = [],
                     ElapsedMilliseconds = executionResult.ElapsedMilliseconds,
                     ResponseSize = 0
                 };
@@ -609,7 +605,7 @@ public class RequestDocumentViewModel : BaseViewModel
         try
         {
             using var document = JsonDocument.Parse(json);
-            return JsonSerializer.Serialize(document, new JsonSerializerOptions { WriteIndented = true });
+            return JsonSerializer.Serialize(document, _formattingOptions);
         }
         catch
         {

@@ -7,7 +7,7 @@ namespace Postgirl.Domain.Http.Body;
 public class FormUrlEncodedBody : HttpBody
 {
     public override BodyType Type => BodyType.FormUrlEncoded;
-    public IList<FormUrlEncodedItem> Items { get; set; } = new List<FormUrlEncodedItem>();
+    public IList<FormUrlEncodedItem> Items { get; set; } = [];
 
     public override HttpContent ToHttpContent()
     {
