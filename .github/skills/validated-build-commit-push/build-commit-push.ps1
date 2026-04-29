@@ -24,12 +24,54 @@ function Invoke-NativeCommand {
     }
 }
 
+function Get-ChangeSummary {
+    $statusLines = @(git status --short)
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Failed to inspect repository status.'
+    }
+
+    $summary = [ordered]@{
+        Modified = 0
+        Created = 0
+        Deleted = 0
+    }
+
+    foreach ($statusLine in $statusLines) {
+        if ([string]::IsNullOrWhiteSpace($statusLine)) {
+            continue
+        }
+
+        $indexStatus = $statusLine.Substring(0, 1)
+        $workTreeStatus = $statusLine.Substring(1, 1)
+        $statuses = @($indexStatus, $workTreeStatus)
+
+        if ($statuses -contains 'A' -or $statuses -contains '?') {
+            $summary.Created++
+            continue
+        }
+
+        if ($statuses -contains 'D') {
+            $summary.Deleted++
+            continue
+        }
+
+        if ($statuses -contains 'M' -or $statuses -contains 'R' -or $statuses -contains 'C' -or $statuses -contains 'T' -or $statuses -contains 'U') {
+            $summary.Modified++
+        }
+    }
+
+    return [pscustomobject]$summary
+}
+
 Write-Host 'Building project...'
 
 try {
     Invoke-NativeCommand -Command { dotnet build .\Postgirl.csproj --nologo } -ErrorMessage 'Build failed. Review the compiler errors above for file and line details.'
 
-    Write-Host 'Staging all changes...'
+    $changeSummary = Get-ChangeSummary
+
+    Write-Host 'Staging all changes, including deletions...'
     Invoke-NativeCommand -Command { git add --all } -ErrorMessage 'Failed to stage repository changes.'
 
     & git diff --cached --quiet
@@ -71,6 +113,9 @@ try {
     }
 
     Write-Host 'Done.'
+    Write-Host "Modified files: $($changeSummary.Modified)"
+    Write-Host "Created files: $($changeSummary.Created)"
+    Write-Host "Deleted files: $($changeSummary.Deleted)"
 }
 catch {
     Write-Error $_

@@ -23,11 +23,13 @@ Typical short trigger phrases:
 
 1. Run `.github/skills/validated-build-commit-push/build-commit-push.ps1 -CommitMessage "<commit_message>"` from the repository root.
 2. If the build fails, stop immediately and show the compiler errors from the command output, including file and line information.
-3. If the build succeeds, stage all changes in the repository.
+3. If the build succeeds, stage all changes in the repository, including tracked files that were deleted from the file system.
 4. Commit the staged changes with the provided commit message.
 5. Push the current branch. If the branch has no upstream yet, create it on `origin`.
+6. Return a summary of how many files were modified, created, and deleted.
 
 ## Notes
 
 - Do not continue to commit or push when the build fails.
 - All tracked, untracked, and deleted files are staged automatically before commit.
+- Deleted tracked files are removed from Git automatically before commit.
