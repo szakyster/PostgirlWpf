@@ -19,8 +19,10 @@ public class HttpRequestModel
 
         Method = other.Method;
         Url = other.Url;
+#pragma warning disable IDE0305 // Simplify collection initialization
         Headers = other.Headers.Select(h => h.Copy()).ToList();
         Parameters = other.Parameters.Select(p => p.Copy()).ToList();
+#pragma warning restore IDE0305 // Simplify collection initialization
         Body = CloneBody(other.Body);
         AuthType = other.AuthType;
         BearerToken = other.BearerToken;
@@ -43,7 +45,7 @@ public class HttpRequestModel
     public bool FollowRedirects { get; set; } = true;
     public bool IgnoreSslErrors { get; set; }
 
-    private static HttpBody CloneBody(HttpBody? body) => body switch
+    private static HttpBody CloneBody(HttpBody body) => body switch
     {
         TextBody text => new TextBody
         {

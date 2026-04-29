@@ -11,6 +11,7 @@ namespace Postgirl.Presentation.ViewModels
         public ObservableCollection<RequestHistoryEntry> HistoryItems
             => _historyService.Items;
 
+        #nullable enable
         public RequestHistoryEntry? SelectedHistoryItem { get; set; }
 
         public void OpenSelectedHistoryItem()

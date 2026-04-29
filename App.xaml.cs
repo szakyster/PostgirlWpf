@@ -54,6 +54,7 @@ namespace Postgirl
                     History = configuration.GetStorageKeepHistoryBetweenSessions() ? history.Export() : [],
                     SavedRequests = saved.Export(),
                     Variables = variables.Export(),
+                    Configuration = configuration.Export(),
                     OpenedDocuments = mainViewModel.ExportOpenedDocuments(),
                     ActiveSidebarPanel = mainViewModel.ActiveSidebarPanel
                 };
@@ -107,6 +108,8 @@ namespace Postgirl
             var configurationService = AppHost.Services.GetRequiredService<ConfigurationService>();
 
             var state = await storageService.LoadAsync();
+
+            configurationService.Import(state.Configuration);
 
             if (configurationService.GetStorageKeepHistoryBetweenSessions())
             {

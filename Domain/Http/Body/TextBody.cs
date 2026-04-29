@@ -9,10 +9,12 @@ public class TextBody : HttpBody
     public string Content { get; set; } = "";
     public string ContentType { get; set; } = "text/plain";
 
-    public override HttpContent? ToHttpContent()
+    public override HttpContent ToHttpContent()
     {
         if (string.IsNullOrWhiteSpace(Content))
-            return null;
+        {
+            return new StringContent(string.Empty, Encoding.UTF8, ContentType);
+        }
 
         return new StringContent(Content, Encoding.UTF8, ContentType);
     }

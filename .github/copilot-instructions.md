@@ -9,3 +9,4 @@
 - Comments must be written in English.
 - Chat responses must be in Hungarian.
 - When possible, use the existing color palette for design changes.
+- Use nullable reference types and nullable value types only where necessary.

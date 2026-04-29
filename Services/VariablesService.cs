@@ -16,7 +16,7 @@ public class VariablesService
 
     public bool VariableExists(string key) => Items.Any(e => e.Key == key);
 
-    public string Substitute(string? input)
+    public string Substitute(string input)
     {
         if (string.IsNullOrEmpty(input))
             return input ?? string.Empty;

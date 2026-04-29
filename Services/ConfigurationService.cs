@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using Postgirl.Domain.Configuration;
+using Postgirl.Domain.Persistence;
 
 namespace Postgirl.Services;
 
@@ -94,6 +95,45 @@ public class ConfigurationService
         return GetBool(ConfigurationKeys.StorageKeepHistoryBetweenSessions);
     }
 
+    public List<ConfigurationStateEntry> Export()
+    {
+        return Items
+            .Select(entry => new ConfigurationStateEntry
+            {
+                Key = entry.Key,
+                Value = entry.Value
+            })
+            .ToList();
+    }
+
+    public void Import(IEnumerable<ConfigurationStateEntry> entries)
+    {
+        if (entries == null)
+        {
+            return;
+        }
+
+        foreach (var entry in entries)
+        {
+            if (string.IsNullOrWhiteSpace(entry.Key))
+            {
+                continue;
+            }
+
+            if (!_entriesByKey.TryGetValue(entry.Key, out var existingEntry))
+            {
+                continue;
+            }
+
+            if (!IsValidValueForType(entry.Value, existingEntry.ValueType))
+            {
+                continue;
+            }
+
+            existingEntry.Value = entry.Value;
+        }
+    }
+
     private ConfigurationEntry GetTypedEntry(string key, ConfigurationValueType expectedValueType)
     {
         var entry = Get(key);
@@ -103,6 +143,17 @@ public class ConfigurationService
 
         throw new InvalidOperationException(
             $"Configuration entry '{key}' is of type '{entry.ValueType}' instead of '{expectedValueType}'.");
+    }
+
+    private static bool IsValidValueForType(string value, ConfigurationValueType valueType)
+    {
+        return valueType switch
+        {
+            ConfigurationValueType.String => true,
+            ConfigurationValueType.Integer => int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out _),
+            ConfigurationValueType.Boolean => bool.TryParse(value, out _),
+            _ => false
+        };
     }
 
     private static List<ConfigurationEntry> CreateDefaultEntries()

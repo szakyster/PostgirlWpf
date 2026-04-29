@@ -11,5 +11,6 @@ public class AppState
     public List<SavedRequestEntry> SavedRequests { get; set; } = [];
     public List<OpenedDocumentEntry> OpenedDocuments { get; set; } = [];
     public List<VariableEntry> Variables { get; set; } = [];
+    public List<ConfigurationStateEntry> Configuration { get; set; } = [];
     public string ActiveSidebarPanel { get; set; } = "SavedExpander";
 }
