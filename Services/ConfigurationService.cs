@@ -14,6 +14,8 @@ public class ConfigurationService
 
     public ReadOnlyCollection<ConfigurationEntry> Items { get; }
 
+    public event Action<string> ConfigurationChanged;
+
     public ConfigurationService()
     {
         var entries = CreateDefaultEntries();
@@ -95,6 +97,18 @@ public class ConfigurationService
         return GetBool(ConfigurationKeys.StorageKeepHistoryBetweenSessions);
     }
 
+    public void SetValue(string key, string value)
+    {
+        var entry = Get(key);
+
+        if (!IsValidValueForType(value, entry.ValueType))
+        {
+            throw new InvalidOperationException($"Configuration entry '{key}' does not contain a valid '{entry.ValueType}' value.");
+        }
+
+        ApplyValue(entry, value);
+    }
+
     public List<ConfigurationStateEntry> Export()
     {
         return Items
@@ -130,7 +144,7 @@ public class ConfigurationService
                 continue;
             }
 
-            existingEntry.Value = entry.Value;
+            ApplyValue(existingEntry, entry.Value);
         }
     }
 
@@ -154,6 +168,17 @@ public class ConfigurationService
             ConfigurationValueType.Boolean => bool.TryParse(value, out _),
             _ => false
         };
+    }
+
+    private void ApplyValue(ConfigurationEntry entry, string value)
+    {
+        if (string.Equals(entry.Value, value, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        entry.Value = value;
+        ConfigurationChanged?.Invoke(entry.Key);
     }
 
     private static List<ConfigurationEntry> CreateDefaultEntries()

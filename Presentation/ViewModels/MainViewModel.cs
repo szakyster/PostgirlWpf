@@ -1,4 +1,5 @@
 ﻿using Postgirl.Common;
+using Postgirl.Domain.Configuration;
 using Postgirl.Domain.History;
 using Postgirl.Domain.Http;
 using Postgirl.Domain.Persistence;
@@ -20,7 +21,8 @@ public class MainViewModel : BaseViewModel
     private readonly HistoryService _historyService;
     private readonly StorageService _storageService;
     private readonly SavedRequestService _savedRequestService;
-    private readonly VariablesService _variablesService;
+    //private readonly VariablesService _variablesService;
+    private readonly ConfigurationService _configurationService;
 
     public HistoryViewModel HistoryViewModel { get; }
     public VariablesViewModel VariablesViewModel { get; }
@@ -45,7 +47,13 @@ public class MainViewModel : BaseViewModel
         }
     }
 
-    public bool IsVariablesPanelVisible { get; }
+    private bool _isVariablesPanelVisible;
+
+    public bool IsVariablesPanelVisible
+    {
+        get => _isVariablesPanelVisible;
+        private set => SetProperty(ref _isVariablesPanelVisible, value);
+    }
 
     public string AppVersion
     {
@@ -66,10 +74,12 @@ public class MainViewModel : BaseViewModel
     {
         _storageService = storageService;
         _savedRequestService = savedRequestService;
-        _variablesService = variablesService;
+        //_variablesService = variablesService;
+        _configurationService = configurationService;
         _httpExecutor = httpExecutor;
         _historyService = historyService;
         IsVariablesPanelVisible = configurationService.GetVariablesEnabled();
+        _configurationService.ConfigurationChanged += OnConfigurationChanged;
 
         HistoryViewModel = new HistoryViewModel(historyService, this);
         VariablesViewModel = new VariablesViewModel(variablesService);
@@ -79,6 +89,21 @@ public class MainViewModel : BaseViewModel
         DeleteSavedRequestCommand = new RelayCommand<SavedRequestEntry>(DeleteSavedRequest);
 
         LoadState();
+    }
+
+    private void OnConfigurationChanged(string key)
+    {
+        if (!string.Equals(key, ConfigurationKeys.VariablesEnabled, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        IsVariablesPanelVisible = _configurationService.GetVariablesEnabled();
+
+        if (!IsVariablesPanelVisible && string.Equals(ActiveSidebarPanel, "VariablesExpander", StringComparison.Ordinal))
+        {
+            ActiveSidebarPanel = "SavedExpander";
+        }
     }
 
     private async void LoadState()

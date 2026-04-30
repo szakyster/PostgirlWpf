@@ -30,8 +30,7 @@ public class EditConfigurationViewModel
                 continue;
             }
 
-            var configurationEntry = _configurationService.Get(item.Key);
-            configurationEntry.Value = item.Value;
+            _configurationService.SetValue(item.Key, item.Value);
         }
     }
 
