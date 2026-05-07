@@ -28,7 +28,8 @@
 
             <Button Content="Reset"
                     Style="{StaticResource SecondaryButtonStyle}"
-                    Padding="16,8" />
+                    Padding="16,8"
+                    Click="ResetButton_Click" />
         </StackPanel>
 
         <TextBlock DockPanel.Dock="Top"

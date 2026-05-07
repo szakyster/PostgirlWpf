@@ -28,6 +28,14 @@ public partial class EditConfigurationWindow : Window
         }
     }
 
+    private void ResetButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is EditConfigurationViewModel viewModel)
+        {
+            viewModel.ResetChanges();
+        }
+    }
+
     private void IntegerTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         if (sender is not TextBox textBox)

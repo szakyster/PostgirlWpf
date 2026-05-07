@@ -1,5 +1,6 @@
 using Postgirl.Domain.Configuration;
 using Postgirl.Services;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -9,10 +10,14 @@ namespace Postgirl.Presentation.ViewModels;
 public class EditConfigurationViewModel
 {
     private readonly ConfigurationService _configurationService;
+    private readonly Dictionary<string, string> _originalValuesByKey;
 
     public EditConfigurationViewModel(ConfigurationService configurationService)
     {
         _configurationService = configurationService;
+        _originalValuesByKey = configurationService.Items
+            .ToDictionary(entry => entry.Key, entry => entry.Value);
+
         Items = new ObservableCollection<ConfigurationItemViewModel>(
             configurationService.Items.Select(entry => new ConfigurationItemViewModel(entry)));
     }
@@ -31,6 +36,17 @@ public class EditConfigurationViewModel
             }
 
             _configurationService.SetValue(item.Key, item.Value);
+        }
+    }
+
+    public void ResetChanges()
+    {
+        foreach (var item in Items)
+        {
+            if (_originalValuesByKey.TryGetValue(item.Key, out var originalValue))
+            {
+                item.ApplyRawValue(originalValue);
+            }
         }
     }
 

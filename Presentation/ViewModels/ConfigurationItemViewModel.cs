@@ -71,4 +71,19 @@ public class ConfigurationItemViewModel : BaseViewModel
         ConfigurationValueType.Boolean => true,
         _ => false
     };
+
+    public void ApplyRawValue(string value)
+    {
+        if (IsBooleanValueType)
+        {
+            if (bool.TryParse(value, out var boolValue))
+            {
+                BoolValue = boolValue;
+            }
+
+            return;
+        }
+
+        TextValue = value;
+    }
 }
