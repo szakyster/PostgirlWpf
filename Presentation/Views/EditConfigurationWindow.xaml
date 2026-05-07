@@ -20,16 +20,16 @@
                     Margin="0,0,8,0"
                     Click="SaveButton_Click" />
 
-            <Button Content="Cancel"
-                    Style="{StaticResource SecondaryButtonStyle}"
-                    Padding="16,8"
-                    Margin="0,0,8,0"
-                    Click="CancelButton_Click" />
-
             <Button Content="Reset"
                     Style="{StaticResource SecondaryButtonStyle}"
                     Padding="16,8"
+                    Margin="0,0,8,0"
                     Click="ResetButton_Click" />
+
+            <Button Content="Cancel"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Padding="16,8"
+                    Click="CancelButton_Click" />
         </StackPanel>
 
         <TextBlock DockPanel.Dock="Top"
@@ -38,6 +38,18 @@
                    FontWeight="SemiBold"
                    Foreground="{StaticResource Brush.TextPrimary}"
                    Margin="0,0,0,16" />
+
+        <Border DockPanel.Dock="Top"
+                Background="{StaticResource Brush.Surface}"
+                BorderBrush="{StaticResource Brush.Warning}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12,8"
+                Margin="0,0,0,12">
+            <TextBlock Text="Warning: some configuration values only take effect after restarting the application."
+                       Foreground="{StaticResource Brush.Warning}"
+                       TextWrapping="Wrap" />
+        </Border>
 
         <Border Background="{StaticResource Brush.SurfaceElevated}"
                 BorderBrush="{StaticResource Brush.Border}"
@@ -75,6 +87,19 @@
                                 <Border BorderBrush="{StaticResource Brush.Border}"
                                         BorderThickness="0,0,0,1"
                                         Padding="0,10">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background"
+                                                    Value="Transparent" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsModified}"
+                                                             Value="True">
+                                                    <Setter Property="Background"
+                                                            Value="{StaticResource Brush.Surface}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="240" />
