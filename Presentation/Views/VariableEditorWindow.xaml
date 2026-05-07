@@ -4,9 +4,7 @@
         Width="520" Height="380"
         MinWidth="340" MinHeight="240"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="CanResize"
-        Background="{StaticResource Brush.Background}"
-        ShowInTaskbar="False">
+        Style="{StaticResource DialogWindowStyle}">
 
     <DockPanel Margin="12">
 

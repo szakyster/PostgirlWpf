@@ -19,7 +19,6 @@ public class HttpRequestModel
 
         Method = other.Method;
         Url = other.Url;
-#pragma warning disable IDE0305 // Simplify collection initialization
         Headers = other.Headers.Select(h => h.Copy()).ToList();
         Parameters = other.Parameters.Select(p => p.Copy()).ToList();
 #pragma warning restore IDE0305 // Simplify collection initialization

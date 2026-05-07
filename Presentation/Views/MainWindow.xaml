@@ -22,47 +22,20 @@
 
 	<DockPanel Background="{StaticResource Brush.Surface}">
 
-		<!-- top bar -->
 		<Border DockPanel.Dock="Top"
 		        Background="{StaticResource Brush.SurfaceElevated}"
 		        BorderBrush="{StaticResource Brush.Border}"
-		        BorderThickness="0,0,0,1"
-		        Padding="12,8">
+		        BorderThickness="0,0,0,1">
 
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
-
-				<!-- LEFT ACTIONS -->
-				<StackPanel Orientation="Horizontal"
-				            VerticalAlignment="Center">
-
-					<Button Content="+ New"
-					        Command="{Binding NewTabCommand}"
-					        Style="{StaticResource AccentButtonStyle}"
-					        Margin="0,0,8,0"
-							Padding="10, 0, 10, 0"
-					        />
-
-				</StackPanel>
-
-				<!-- CENTER (reserved for future search maybe) -->
-				<ContentControl Grid.Column="1"/>
-
-				<!-- RIGHT SIDE (future environment selector) -->
-				<StackPanel Grid.Column="2"
-				            Orientation="Horizontal"
-				            VerticalAlignment="Center">
-
-					<!-- Future: Environment selector -->
-					<!-- <ComboBox Width="180"/> -->
-
-				</StackPanel>
-
-			</Grid>
+			<Menu Background="{StaticResource Brush.SurfaceElevated}"
+			      Foreground="{StaticResource Brush.TextPrimary}">
+				<MenuItem Header="New"
+				          Command="{Binding NewTabCommand}" />
+				<MenuItem Header="Options"
+				          Click="OptionsMenuItem_Click" />
+				<MenuItem Header="Exit"
+				          Click="ExitMenuItem_Click" />
+			</Menu>
 
 		</Border>
 

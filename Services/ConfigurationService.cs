@@ -14,6 +14,8 @@ public class ConfigurationService
 
     public ReadOnlyCollection<ConfigurationEntry> Items { get; }
 
+    public event Action<string> ConfigurationChanged;
+
     public ConfigurationService()
     {
         var entries = CreateDefaultEntries();
@@ -95,6 +97,18 @@ public class ConfigurationService
         return GetBool(ConfigurationKeys.StorageKeepHistoryBetweenSessions);
     }
 
+    public void SetValue(string key, string value)
+    {
+        var entry = Get(key);
+
+        if (!IsValidValueForType(value, entry.ValueType))
+        {
+            throw new InvalidOperationException($"Configuration entry '{key}' does not contain a valid '{entry.ValueType}' value.");
+        }
+
+        ApplyValue(entry, value);
+    }
+
     public List<ConfigurationStateEntry> Export()
     {
         return Items
@@ -130,7 +144,7 @@ public class ConfigurationService
                 continue;
             }
 
-            existingEntry.Value = entry.Value;
+            ApplyValue(existingEntry, entry.Value);
         }
     }
 
@@ -156,6 +170,17 @@ public class ConfigurationService
         };
     }
 
+    private void ApplyValue(ConfigurationEntry entry, string value)
+    {
+        if (string.Equals(entry.Value, value, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        entry.Value = value;
+        ConfigurationChanged?.Invoke(entry.Key);
+    }
+
     private static List<ConfigurationEntry> CreateDefaultEntries()
     {
         return
@@ -164,6 +189,7 @@ public class ConfigurationService
             {
                 Key = ConfigurationKeys.RetainedHistoryItemCount,
                 DisplayName = "Retained history item count",
+                Description = "Maximum number of request history entries kept in memory.",
                 ValueType = ConfigurationValueType.Integer,
                 Value = "100"
             },
@@ -171,6 +197,7 @@ public class ConfigurationService
             {
                 Key = ConfigurationKeys.HistoryGroupByDateEnabled,
                 DisplayName = "Group history by date",
+                Description = "Group history entries by execution date in the sidebar.",
                 ValueType = ConfigurationValueType.Boolean,
                 Value = "true"
             },
@@ -178,6 +205,7 @@ public class ConfigurationService
             {
                 Key = ConfigurationKeys.HttpRequestTimeoutSeconds,
                 DisplayName = "HTTP request timeout in seconds",
+                Description = "Timeout applied to outgoing HTTP requests in seconds.",
                 ValueType = ConfigurationValueType.Integer,
                 Value = "30"
             },
@@ -185,6 +213,7 @@ public class ConfigurationService
             {
                 Key = ConfigurationKeys.HttpMaxResponseBodySizeKb,
                 DisplayName = "Maximum HTTP response body size in KB",
+                Description = "Maximum response body size stored in memory in kilobytes.",
                 ValueType = ConfigurationValueType.Integer,
                 Value = "1024"
             },
@@ -192,6 +221,7 @@ public class ConfigurationService
             {
                 Key = ConfigurationKeys.HttpDefaultUserAgent,
                 DisplayName = "Default HTTP User-Agent",
+                Description = "Default User-Agent header value used for outgoing requests.",
                 ValueType = ConfigurationValueType.String,
                 Value = "Postgirl/1.0"
             },
@@ -199,6 +229,7 @@ public class ConfigurationService
             {
                 Key = ConfigurationKeys.VariablesEnabled,
                 DisplayName = "Enable variable handling",
+                Description = "Enable variable substitution and the variables sidebar panel.",
                 ValueType = ConfigurationValueType.Boolean,
                 Value = "true"
             },
@@ -206,6 +237,7 @@ public class ConfigurationService
             {
                 Key = ConfigurationKeys.StorageKeepHistoryBetweenSessions,
                 DisplayName = "Keep history between sessions",
+                Description = "Persist request history between application sessions.",
                 ValueType = ConfigurationValueType.Boolean,
                 Value = "true"
             }
