@@ -87,7 +87,7 @@ public class RequestDocumentViewModel : BaseViewModel
 
             // Ha nem http:// vagy https://, egészítsd ki
             if (!value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
-                !value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                !value.StartsWith("https://", StringComparison.OrdinalIgnoreCase) && !value.Contains("://"))
             {
                 value = "http://" + value;
             }
