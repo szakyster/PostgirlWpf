@@ -20,7 +20,11 @@
     <None Remove="Assets\postgirl.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".github\agents\developer.md" />
+    <None Include=".github\agents\planner.md" />
     <None Include=".github\copilot-instructions.md" />
+    <None Include=".github\instructions\agent-behavior.instructions.md" />
+    <None Include=".github\instructions\development.instructions.md" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />

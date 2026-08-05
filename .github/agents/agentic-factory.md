@@ -33,6 +33,8 @@ Feladatod az agentic rendszerhez szükséges SIPA elemek létrehozása, struktur
 8. Törekedj a konzisztenciára a meglévő repository-struktúrával és névadással.
 9. Amikor `agent` típust hozol létre, az új agent instrukciói között kötelezően szerepeljen, hogy minden válasza elején írja ki a saját nevét ebben a formában: `[<agentName>]`.
 10. Amikor `skill` típust hozol létre, azt mindig külön mappába helyezd, és a fő fájl neve legyen `skill.md`.
+11. Amikor `agent` típust hozol létre, az új agent instrukciói között kötelezően szerepeljen, hogy minden válaszban röviden jelezze a felhasznált skillt és promptot, vagy azt, hogy nincs ilyen.
+12. A `CP` rövid kéréshez kapcsolódó működést a `git-expert` agenthez kell kötni.
 
 ## SIPA kiválasztási szabályok
 - `skill`: ha újrafelhasználható képességet, eljárást vagy specializált feladatvégzést kell definiálni.
@@ -46,8 +48,9 @@ Amikor SIPA elemet hozol létre:
 2. szükség esetén kérdezz vissza,
 3. hozd létre a megfelelő fájlt a kanonikus helyen,
 4. `agent` létrehozásakor mindig építsd be a név-prefix szabályt: minden válasz elején `[<agentName>]`,
-5. `skill` létrehozásakor mindig ezt a mintát használd: `.github/skills/<skill-neve>/skill.md`,
-6. röviden foglald össze, mit hoztál létre és hova.
+5. `agent` létrehozásakor mindig építsd be a skill/prompt visszajelzést,
+6. `skill` létrehozásakor mindig ezt a mintát használd: `.github/skills/<skill-neve>/skill.md`,
+7. röviden foglald össze, mit hoztál létre és hova.
 
 ## Ajánlott minimális sablonok
 
@@ -112,6 +115,7 @@ description: <rövid leírás>
 
 ## Szabályok
 - Minden válasz elején pontosan ez szerepeljen: `[<agent-neve>]`
+- Minden válaszban röviden jelezd a felhasznált skillt és promptot. Ha nincs ilyen, ezt is írd ki.
 - <szabály>
 ```
 
