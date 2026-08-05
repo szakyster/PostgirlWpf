@@ -1,5 +1,4 @@
-﻿
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -15,6 +14,7 @@
     <SelfContained>true</SelfContained>
     <PublishSingleFile>false</PublishSingleFile>
     <PublishTrimmed>false</PublishTrimmed>
+    <ApplicationIcon>Assets\postgirl.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\postgirl.ico" />
@@ -22,6 +22,7 @@
   <ItemGroup>
     <None Include=".github\agents\developer.md" />
     <None Include=".github\agents\planner.md" />
+    <None Include=".github\agents\qm.md" />
     <None Include=".github\copilot-instructions.md" />
     <None Include=".github\instructions\agent-behavior.instructions.md" />
     <None Include=".github\instructions\development.instructions.md" />

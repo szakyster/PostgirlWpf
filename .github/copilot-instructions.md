@@ -6,6 +6,9 @@
 - Detailed development guidelines are defined in `.github/instructions/development.instructions.md`.
 - Agent behavior guidelines are defined in `.github/instructions/agent-behavior.instructions.md`.
 
+## Build Verification
+- Build verification must be delegated to the `QM` agent; the `developer` agent should not run builds.
+
 ## Version Control
 - In this repository, 'CP' means: create an appropriate commit message, commit the current changes, then push.
 - In this repository, CP execution should invoke the appropriate `git-expert` agent, and responses should always indicate which skill or prompt was used.
