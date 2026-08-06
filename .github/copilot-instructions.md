@@ -7,7 +7,7 @@
 - Agent behavior guidelines are defined in `.github/instructions/agent-behavior.instructions.md`.
 
 ## Build Verification
-- Build verification must be delegated to the `QM` agent; the `developer` agent should not run builds.
+- Build verification must be delegated to the `QM` agent; the `developer` agent should not run builds directly but may explicitly request the `QM` agent to perform build verification.
 
 ## Version Control
 - In this repository, 'CP' means: create an appropriate commit message, commit the current changes, then push.

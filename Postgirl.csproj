@@ -7,7 +7,7 @@
     <Product>Postgirl</Product>
     <Company>KHE Tools</Company>
     <Description>Lightweight standalone HTTP client for developers</Description>
-    <Version>0.1.0-alpha</Version>
+    <Version>0.1.0-beta</Version>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -23,6 +23,7 @@
     <None Include=".github\agents\developer.md" />
     <None Include=".github\agents\planner.md" />
     <None Include=".github\agents\qm.md" />
+    <None Include=".github\agents\release-manager.md" />
     <None Include=".github\copilot-instructions.md" />
     <None Include=".github\instructions\agent-behavior.instructions.md" />
     <None Include=".github\instructions\development.instructions.md" />

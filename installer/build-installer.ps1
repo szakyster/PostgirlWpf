@@ -81,7 +81,7 @@ function Get-InstallerOutputBaseFileName {
         [string]$FullVersion
     )
 
-    return "{0}-Setup-{1}" -f $AppName, $FullVersion
+    return "{0}-Install-{1}" -f $AppName, $FullVersion
 }
 
 $repoRoot = Split-Path -Path $PSScriptRoot -Parent

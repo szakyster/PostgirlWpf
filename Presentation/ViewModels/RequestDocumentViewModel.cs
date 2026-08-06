@@ -83,16 +83,15 @@ public class RequestDocumentViewModel : BaseViewModel
         set
         {
             if (string.IsNullOrWhiteSpace(value))
-                return;
-
-            // Ha nem http:// vagy https://, egészítsd ki
-            if (!value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
-                !value.StartsWith("https://", StringComparison.OrdinalIgnoreCase) && !value.Contains("://"))
             {
-                value = "http://" + value;
+                return;
             }
 
-            if (_request.Url == value) return;
+            if (_request.Url == value)
+            {
+                return;
+            }
+
             _request.Url = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(Title));
@@ -382,6 +381,14 @@ public class RequestDocumentViewModel : BaseViewModel
             }
 
             SyncToDomain();
+            var normalizedUrl = NormalizeUrl(_request.Url);
+            if (!string.Equals(normalizedUrl, _request.Url, StringComparison.Ordinal))
+            {
+                _request.Url = normalizedUrl;
+                OnPropertyChanged(nameof(Url));
+                OnPropertyChanged(nameof(Title));
+            }
+
             var executionResult = await _httpExecutor.ExecuteAsync(_request, _cancellationTokenSource.Token);
             _cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
@@ -586,6 +593,23 @@ public class RequestDocumentViewModel : BaseViewModel
     {
         _request.Headers = RequestHeaders.Select(h => h.Domain).ToList();
         _request.Parameters = RequestParameters.Select(p => p.Domain).ToList();
+    }
+
+    private static string NormalizeUrl(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        if (!value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !value.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+            !value.Contains("://", StringComparison.OrdinalIgnoreCase))
+        {
+            return "http://" + value;
+        }
+
+        return value;
     }
 
     private static bool IsJsonContentType(string mediaType)

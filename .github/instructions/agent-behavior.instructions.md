@@ -7,6 +7,9 @@ applyTo: "**/*"
 ## Routing
 - When the user says `CP`, the request must be handled by the `git-expert` agent.
 - For `CP`, prefer using `.github/skills/validated-build-commit-push/skill.md` when that workflow matches the request and its prerequisites are acceptable.
+- Release orchestration is handled by `release-manager`.
+- In release workflow, git operations (branch switch/check, commit/push, tag/push) must be handled by `git-expert`.
+- In release workflow, build verification must be handled by `QM`.
 
 ## Typical development flow
 - Preferred path for feature delivery: `planner` → `developer` → `QM`.

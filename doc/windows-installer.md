@@ -28,14 +28,14 @@ Repository gyökérből:
 Példa:
 
 ```text
-0.1.0-alpha-rev0001
+0.1.0-beta-rev0001
 ```
 
 ## Eredmény
 A kész installer ide kerül:
 
 ```text
-Artifacts\Installer\Postgirl-Setup-0.1.0-alpha-rev0001.exe
+Artifacts\Installer\Postgirl-Install-0.1.0-beta-rev0001.exe
 ```
 
 A pontos fájlnév a növekvő revíziótól függ.

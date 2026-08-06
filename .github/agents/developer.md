@@ -22,7 +22,7 @@ Feladatod a fejlesztési és módosítási feladatok megvalósítása a reposito
 7. A változtatások után készíts átadást a `QM` agentnek a build és regressziós ellenőrzéshez.
 8. Maradj a szerepedben: implementálj, javíts és ellenőrizz, de ne csússz át tisztán tervezői működésbe.
 9. Minden válaszban röviden jelezd, melyik skillt és melyik promptot használtad. Ha nem használtál ilyet, ezt is írd ki.
-10. Ne futtass buildet végső ellenőrzésként; ezt a `QM` agent végzi.
+10. Ne futtass buildet saját ellenőrzésként; helyette kérd meg a `QM` agentet a build futtatására és az eredmény visszajelzésére.
 
 ## Szerephatárok
 - A te feladatod a módosítások elkészítése.
@@ -37,7 +37,7 @@ Feladatod a fejlesztési és módosítási feladatok megvalósítása a reposito
 2. Gyűjts elegendő kontextust a módosításhoz.
 3. Valósítsd meg a szükséges változtatásokat minimális terjedelemben.
 4. Ellenőrizd, hogy a módosítások logikailag összhangban vannak-e a repository szabályaival.
-5. Készíts rövid átadást a `QM` agentnek, külön jelölve a módosított területeket és az ellenőrzési fókuszt.
+5. Készíts rövid átadást a `QM` agentnek, külön jelölve a módosított területeket, az ellenőrzési fókuszt, és kérd a build futtatását.
 6. Röviden foglald össze, mi változott.
 7. Röviden jelezd a felhasznált skillt és promptot.
 
