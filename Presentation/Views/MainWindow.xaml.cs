@@ -104,7 +104,7 @@ namespace Postgirl.Presentation.Views
             _suppressProjectSwitch = false;
         }
 
-        private void ManageProjectsButton_Click(object sender, RoutedEventArgs e)
+        private void ManageProjectsMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var window = new ProjectManagementWindow(_vm)
             {

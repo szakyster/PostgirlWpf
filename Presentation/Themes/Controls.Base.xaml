@@ -478,7 +478,84 @@
 	</Style>
 
 	<!-- ========================= -->
-	<!-- COMBOBOX STYLE            -->
+	<!-- MENU / MENUITEM STYLE     -->
+	<!-- ========================= -->
+	<Style TargetType="Menu">
+		<Setter Property="Background" Value="{StaticResource Brush.SurfaceElevated}"/>
+		<Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}"/>
+	</Style>
+
+	<Style TargetType="MenuItem">
+		<Setter Property="Background" Value="{StaticResource Brush.SurfaceElevated}"/>
+		<Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}"/>
+		<Setter Property="Padding" Value="10,6"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="MenuItem">
+					<Grid>
+						<Border x:Name="ItemBorder"
+								Background="{TemplateBinding Background}"
+								Padding="{TemplateBinding Padding}">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+								<ContentPresenter ContentSource="Header"
+												  VerticalAlignment="Center"
+												  RecognizesAccessKey="True"/>
+								<Path x:Name="SubArrow"
+									  Grid.Column="1"
+									  Data="M 0 0 L 4 4 L 0 8"
+									  Stroke="{StaticResource Brush.TextSecondary}"
+									  StrokeThickness="1.5"
+									  Margin="10,0,0,0"
+									  VerticalAlignment="Center"
+									  Visibility="Collapsed"/>
+							</Grid>
+						</Border>
+
+						<!-- Submenu popup -->
+						<Popup x:Name="SubMenuPopup"
+							   AllowsTransparency="True"
+							   IsOpen="{TemplateBinding IsSubmenuOpen}"
+							   Placement="Right"
+							   HorizontalOffset="-2"
+							   PopupAnimation="Fade"
+							   Focusable="False">
+							<Border Background="{StaticResource Brush.SurfaceElevated}"
+									BorderBrush="{StaticResource Brush.Border}"
+									BorderThickness="1"
+									CornerRadius="4"
+									Padding="2"
+									SnapsToDevicePixels="True">
+								<StackPanel IsItemsHost="True"/>
+							</Border>
+						</Popup>
+					</Grid>
+					<ControlTemplate.Triggers>
+						<!-- Top-level header: popup goes below -->
+						<Trigger Property="Role" Value="TopLevelHeader">
+							<Setter TargetName="SubMenuPopup" Property="Placement" Value="Bottom"/>
+							<Setter TargetName="SubMenuPopup" Property="HorizontalOffset" Value="0"/>
+							<Setter TargetName="SubArrow" Property="Visibility" Value="Collapsed"/>
+						</Trigger>
+						<!-- Submenu header: show right-arrow -->
+						<Trigger Property="Role" Value="SubmenuHeader">
+							<Setter TargetName="SubArrow" Property="Visibility" Value="Visible"/>
+						</Trigger>
+						<Trigger Property="IsHighlighted" Value="True">
+							<Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource Brush.Surface}"/>
+						</Trigger>
+						<Trigger Property="IsEnabled" Value="False">
+							<Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
 	<!-- ========================= -->
 	<!-- COMBOBOX STYLE            -->
 	<!-- ========================= -->
