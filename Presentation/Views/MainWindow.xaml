@@ -37,8 +37,6 @@
 					<ComboBox x:Name="ProjectComboBox"
 							  ItemsSource="{Binding Projects}"
 							  DisplayMemberPath="Name"
-							  SelectedValuePath="Id"
-							  SelectedValue="{Binding ActiveProjectName, Mode=OneWay}"
 							  MinWidth="160"
 							  Background="{StaticResource Brush.SurfaceElevated}"
 							  Foreground="{StaticResource Brush.TextPrimary}"
