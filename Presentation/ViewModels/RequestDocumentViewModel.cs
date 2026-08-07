@@ -570,7 +570,7 @@ public class RequestDocumentViewModel : BaseViewModel
     private void SortHeaders()
     {
         var ordered = RequestHeaders
-            .OrderByDescending(h => h.IsSystem) // system előre
+            .OrderByDescending(h => h.IsSystem) // system headers first
             .ThenBy(h => h.Key, StringComparer.OrdinalIgnoreCase)
             .ToList();
 

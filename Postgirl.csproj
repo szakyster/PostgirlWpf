@@ -20,7 +20,10 @@
     <None Remove="Assets\postgirl.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".github\agents\agentic-factory.md" />
     <None Include=".github\agents\developer.md" />
+    <None Include=".github\agents\git-expert.md" />
+    <None Include=".github\agents\faggato.md" />
     <None Include=".github\agents\planner.md" />
     <None Include=".github\agents\qm.md" />
     <None Include=".github\agents\release-manager.md" />

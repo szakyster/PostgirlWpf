@@ -6,13 +6,13 @@ public class RequestHeader(string key, string value, bool isSystem)
     public string Value { get; set; } = value;
 
     /// <summary>
-    /// System header: nem szerkeszthető, mindig aktív
+    /// System header: read-only, always active
     /// </summary>
     public bool IsSystem { get; set; } = isSystem;
 
     /// <summary>
-    /// User header esetén jelzi, hogy ténylegesen csatoljuk-e
-    /// System headernél mindig true
+    /// For user headers: indicates whether the header is included in the request.
+    /// Always true for system headers.
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 

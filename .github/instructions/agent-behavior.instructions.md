@@ -11,6 +11,16 @@ applyTo: "**/*"
 - In release workflow, git operations (branch switch/check, commit/push, tag/push) must be handled by `git-expert`.
 - In release workflow, build verification must be handled by `QM`.
 
+## Fejlesztési és kódmódosítási feladatok kizárólagos tulajdonosa
+- Bármilyen fejlesztési, kódírási vagy kódmódosítási feladatot **kizárólag a `developer` agent** végezhet el.
+- Ez alól nincs kivétel: más agent (pl. `planner`, `QM`, `faggato`, `agentic-factory`, `git-expert`, `release-manager`) **nem módosíthat forráskódot** és **nem végezhet fejlesztési feladatot**.
+- Ha egy ilyen feladat felmerül, az adott agent jelezze, hogy a feladatot a `developer` agentnek kell átadni, és hívja meg azt.
+
+## SIPA elemek módosításának kizárólagos tulajdonosa
+- Bármilyen SIPA elem (skill, instruction, prompt, agent) létrehozását vagy módosítását **kizárólag az `agentic-factory` agent** végezheti el.
+- Ez alól nincs kivétel: más agent **nem hozhat létre és nem módosíthat** `.github/agents/`, `.github/skills/`, `.github/instructions/` vagy `.github/prompts/` alatt lévő fájlokat.
+- Ha ilyen feladat merül fel, az adott agent jelezze, hogy a feladatot az `agentic-factory` agentnek kell átadni, és hívja meg azt.
+
 ## Typical development flow
 - Preferred path for feature delivery: `planner` → `developer` → `QM`.
 - `planner` defines the plan and acceptance logic.

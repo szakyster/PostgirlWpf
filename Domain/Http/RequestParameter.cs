@@ -6,7 +6,7 @@ public class RequestParameter(string key, string value)
     public string Value { get; set; } = value;
 
     /// <summary>
-    /// Jelzi, hogy a paraméter csatolva legyen-e az URL-hez
+    /// Indicates whether the parameter is appended to the URL.
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 

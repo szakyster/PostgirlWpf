@@ -20,7 +20,7 @@ public class HistoryService
 
     public void Add(RequestHistoryEntry entry)
     {
-        Items.Insert(0, entry); // legfrissebb felül
+        Items.Insert(0, entry); // most recent first
     }
 
     public List<RequestHistoryEntry> Export()

@@ -18,8 +18,21 @@ namespace Postgirl
 
         public static IHost AppHost { get; private set; } = null!;
 
+        private readonly LockfileService _lockfileService = new();
+
         protected override async void OnStartup(StartupEventArgs e)
         {
+            if (!_lockfileService.TryAcquire())
+            {
+                MessageBox.Show(
+                    "A Postgirl már fut egy másik ablakban.\n\nEgyszerre csak egy példány indítható el.",
+                    "Postgirl – már fut",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                Shutdown();
+                return;
+            }
+
             try
             {
                 AppHost = Host.CreateDefaultBuilder()
@@ -71,6 +84,10 @@ namespace Postgirl
             catch (Exception exception)
             {
                 Console.WriteLine(exception.Message);
+            }
+            finally
+            {
+                _lockfileService.Dispose();
             }
         }
 

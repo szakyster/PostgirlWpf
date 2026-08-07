@@ -1,6 +1,6 @@
 # Postgirl
 
-> Standalone desktop HTTP client for API testing and web server communication analysis. UNDER CONSTRUCTION
+> Standalone desktop HTTP client for API testing and web server communication analysis. BETA
 
 ---
 
