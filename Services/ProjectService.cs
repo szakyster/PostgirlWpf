@@ -1,6 +1,7 @@
 using Postgirl.Domain.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ public class ProjectService
     private readonly ConfigurationService _configuration;
 
     public ProjectState ActiveProject { get; private set; } = null!;
-    public List<ProjectSummary> Projects { get; private set; } = [];
+    public ObservableCollection<ProjectSummary> Projects { get; private set; } = [];
 
     public ProjectService(
         StorageService storage,
@@ -49,7 +50,7 @@ public class ProjectService
         SanitizeIndex(index);
         _storage.SaveIndex(index);
 
-        Projects = index.Projects;
+        Projects = new ObservableCollection<ProjectSummary>(index.Projects);
 
         var active = await _storage.LoadProjectAsync(index.ActiveProjectId)
                      ?? CreateDefaultProject(index.ActiveProjectId);
@@ -212,7 +213,7 @@ public class ProjectService
 
     private void UpdateActiveInIndex(string id)
     {
-        var index = new ProjectsIndex { ActiveProjectId = id, Projects = Projects };
+        var index = new ProjectsIndex { ActiveProjectId = id, Projects = Projects.ToList() };
         _storage.SaveIndex(index);
     }
 
@@ -221,7 +222,7 @@ public class ProjectService
         _storage.SaveIndex(new ProjectsIndex
         {
             ActiveProjectId = ActiveProject?.Id ?? Projects.FirstOrDefault()?.Id ?? string.Empty,
-            Projects = Projects
+            Projects = Projects.ToList()
         });
     }
 

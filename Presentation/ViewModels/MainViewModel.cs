@@ -116,7 +116,7 @@ public class MainViewModel : BaseViewModel
 
     public string ActiveProjectName => _projectService.ActiveProject?.Name ?? string.Empty;
 
-    public IReadOnlyList<ProjectSummary> Projects => _projectService.Projects;
+    public ObservableCollection<ProjectSummary> Projects => _projectService.Projects;
 
     public async Task DuplicateProjectAsync(string sourceId, string name)
     {
@@ -157,7 +157,6 @@ public class MainViewModel : BaseViewModel
     {
         _projectService.RenameProject(id, newName);
         OnPropertyChanged(nameof(ActiveProjectName));
-        OnPropertyChanged(nameof(Projects));
     }
 
     private void ExportOpenedDocumentsToActiveProject()
