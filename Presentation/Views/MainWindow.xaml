@@ -23,19 +23,57 @@
 	<DockPanel Background="{StaticResource Brush.Surface}">
 
 		<Border DockPanel.Dock="Top"
-		        Background="{StaticResource Brush.SurfaceElevated}"
-		        BorderBrush="{StaticResource Brush.Border}"
-		        BorderThickness="0,0,0,1">
+				Background="{StaticResource Brush.SurfaceElevated}"
+				BorderBrush="{StaticResource Brush.Border}"
+				BorderThickness="0,0,0,1">
 
-			<Menu Background="{StaticResource Brush.SurfaceElevated}"
-			      Foreground="{StaticResource Brush.TextPrimary}">
-				<MenuItem Header="New"
-				          Command="{Binding NewTabCommand}" />
-				<MenuItem Header="Options"
-				          Click="OptionsMenuItem_Click" />
-				<MenuItem Header="Exit"
-				          Click="ExitMenuItem_Click" />
-			</Menu>
+			<DockPanel>
+
+				<!-- Project switcher (right side) -->
+				<Border DockPanel.Dock="Right"
+						BorderBrush="{StaticResource Brush.Border}"
+						BorderThickness="1,0,0,0"
+						Padding="0">
+					<ComboBox x:Name="ProjectComboBox"
+							  ItemsSource="{Binding Projects}"
+							  DisplayMemberPath="Name"
+							  SelectedValuePath="Id"
+							  SelectedValue="{Binding ActiveProjectName, Mode=OneWay}"
+							  MinWidth="160"
+							  Background="{StaticResource Brush.SurfaceElevated}"
+							  Foreground="{StaticResource Brush.TextPrimary}"
+							  BorderThickness="0"
+							  Padding="10,6"
+							  SelectionChanged="ProjectComboBox_SelectionChanged"
+							  ToolTip="Switch project"/>
+				</Border>
+
+				<!-- Manage projects button -->
+				<Border DockPanel.Dock="Right"
+						BorderBrush="{StaticResource Brush.Border}"
+						BorderThickness="1,0,0,0">
+					<Button Content="⚙"
+							ToolTip="Manage projects"
+							Background="Transparent"
+							Foreground="{StaticResource Brush.TextSecondary}"
+							BorderThickness="0"
+							Padding="10,6"
+							FontSize="14"
+							Click="ManageProjectsButton_Click"/>
+				</Border>
+
+				<!-- Menu (left side) -->
+				<Menu Background="{StaticResource Brush.SurfaceElevated}"
+					  Foreground="{StaticResource Brush.TextPrimary}">
+					<MenuItem Header="New"
+							  Command="{Binding NewTabCommand}" />
+					<MenuItem Header="Options"
+							  Click="OptionsMenuItem_Click" />
+					<MenuItem Header="Exit"
+							  Click="ExitMenuItem_Click" />
+				</Menu>
+
+			</DockPanel>
 
 		</Border>
 

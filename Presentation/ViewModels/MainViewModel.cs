@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Postgirl.Presentation.ViewModels;
@@ -19,10 +20,9 @@ public class MainViewModel : BaseViewModel
 {
     private readonly IHttpExecutor _httpExecutor;
     private readonly HistoryService _historyService;
-    private readonly StorageService _storageService;
     private readonly SavedRequestService _savedRequestService;
-    //private readonly VariablesService _variablesService;
     private readonly ConfigurationService _configurationService;
+    private readonly ProjectService _projectService;
 
     public HistoryViewModel HistoryViewModel { get; }
     public VariablesViewModel VariablesViewModel { get; }
@@ -67,17 +67,16 @@ public class MainViewModel : BaseViewModel
     public MainViewModel(
         IHttpExecutor httpExecutor,
         HistoryService historyService,
-        StorageService storageService,
         SavedRequestService savedRequestService,
         VariablesService variablesService,
-        ConfigurationService configurationService)
+        ConfigurationService configurationService,
+        ProjectService projectService)
     {
-        _storageService = storageService;
         _savedRequestService = savedRequestService;
-        //_variablesService = variablesService;
         _configurationService = configurationService;
         _httpExecutor = httpExecutor;
         _historyService = historyService;
+        _projectService = projectService;
         IsVariablesPanelVisible = configurationService.GetVariablesEnabled();
         _configurationService.ConfigurationChanged += OnConfigurationChanged;
 
@@ -87,8 +86,10 @@ public class MainViewModel : BaseViewModel
         NewTabCommand = new RelayCommand(AddNewDocument);
         CloseDocumentCommand = new RelayCommand<RequestDocumentViewModel>(CloseDocument);
         DeleteSavedRequestCommand = new RelayCommand<SavedRequestEntry>(DeleteSavedRequest);
-
-        LoadState();
+        SwitchProjectCommand = new RelayCommand<string>(async id => await SwitchProjectAsync(id));
+        CreateProjectCommand = new RelayCommand<string>(name => CreateProject(name));
+        DeleteProjectCommand = new RelayCommand<string>(id => DeleteProject(id));
+        RenameProjectCommand = new RelayCommand<(string id, string name)>(args => RenameProject(args.id, args.name));
     }
 
     private void OnConfigurationChanged(string key)
@@ -106,10 +107,81 @@ public class MainViewModel : BaseViewModel
         }
     }
 
-    private async void LoadState()
+    // ── Project ───────────────────────────────────────────────────────────────
+
+    public ICommand SwitchProjectCommand { get; }
+    public ICommand CreateProjectCommand { get; }
+    public ICommand DeleteProjectCommand { get; }
+    public ICommand RenameProjectCommand { get; }
+
+    public string ActiveProjectName => _projectService.ActiveProject?.Name ?? string.Empty;
+
+    public IReadOnlyList<ProjectSummary> Projects => _projectService.Projects;
+
+    public async Task DuplicateProjectAsync(string sourceId, string name)
     {
-        var state = await _storageService.LoadAsync();
-        _historyService.Import(state.History);
+        await _projectService.DuplicateProjectAsync(sourceId, name);
+        OnPropertyChanged(nameof(Projects));
+    }
+
+    private async Task SwitchProjectAsync(string id)
+    {
+        ExportOpenedDocumentsToActiveProject();
+        await _projectService.SwitchProjectAsync(id);
+        ReloadDocuments();
+        OnPropertyChanged(nameof(ActiveProjectName));
+        OnPropertyChanged(nameof(Projects));
+    }
+
+    private void CreateProject(string name)
+    {
+        _projectService.CreateProject(name);
+        OnPropertyChanged(nameof(Projects));
+    }
+
+    private void DeleteProject(string id)
+    {
+        var isActive = _projectService.ActiveProject?.Id == id;
+        _projectService.DeleteProject(id);
+
+        if (isActive)
+        {
+            var defaultProject = _projectService.Projects.First(p => p.IsDefault);
+            _ = SwitchProjectAsync(defaultProject.Id);
+        }
+
+        OnPropertyChanged(nameof(Projects));
+    }
+
+    private void RenameProject(string id, string newName)
+    {
+        _projectService.RenameProject(id, newName);
+        OnPropertyChanged(nameof(ActiveProjectName));
+        OnPropertyChanged(nameof(Projects));
+    }
+
+    private void ExportOpenedDocumentsToActiveProject()
+    {
+        if (_projectService.ActiveProject is null)
+            return;
+
+        _projectService.ActiveProject.OpenedDocuments = ExportOpenedDocuments();
+        _projectService.ActiveProject.ActiveSidebarPanel = ActiveSidebarPanel;
+    }
+
+    private void ReloadDocuments()
+    {
+        var openedDocs = _projectService.ActiveProject?.OpenedDocuments;
+        Documents.Clear();
+
+        if (openedDocs != null && openedDocs.Count > 0)
+        {
+            ImportOpenedDocuments(openedDocs);
+        }
+        else
+        {
+            AddNewDocument();
+        }
     }
 
     public ObservableCollection<RequestDocumentViewModel> Documents { get; }

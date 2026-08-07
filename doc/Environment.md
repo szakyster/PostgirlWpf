@@ -7,7 +7,7 @@ változóverziók kezelésére. A projektkezelés célja, hogy a felhasználó k
 
 ## Projektkezelés
 A projektkezelés célja, hogy a felhasználó könnyen tudjon váltani a különböző projektek között. Mindig létezik egy 
-alpértelmezett projekt (default project), amely a felhasználó elsődleges munkaterülete, és nem törölhető. 
+alpértelmezett projekt (default project), amely a felhasználó elsődleges munkaterülete, és nem törölhető, nem átnevezhető. 
 A felhasználó létrehozhat új projekteket, és a projektek közötti váltás egyszerűen elvégezhető. 
 Minden projektnek saját lekérdezéskészlete, változókészlete és historyja van, így a felhasználó könnyen nyomon követheti a változásokat.
 A projektek közötti váltás a felhasználói felületen keresztül történik, és a kiválasztott projekt lesz az aktív projekt, 
@@ -21,8 +21,8 @@ A projektek, és a projekt tartalma a szokásos módon kerül elmentésre. Az ed
 - A felhasználó létrehozhat új projektet, vagy duplikálhat egy meglévőt, aminek kötelező egyedi nevet adnia.
 - A felhasználó bármikor válthat a projektek között, és az aktív projekt lesz az, amelyben a felhasználó dolgozik. 
 Projektváltáskor a projekt tartalma a szokásos módon kerül elmentésre.
-- (opcionális/döntés szükséges): csak az aktuális projekt tartalma tárolódik a memóriában, projektváltáskor a projekt
-- tartalma a mentésből kerül beolvasásra.
+- Csak az aktuális projekt tartalma tárolódik a memóriában, projektváltáskor a projekt
+ tartalma a mentésből kerül beolvasásra.
 - A felhasználó bármikor törölhet egy projektet, kivéve a default projektet, amely nem törölhető. A törlés előtt a 
 felhasználót figyelmeztetni kell, kiemelve, hogy a törlés végleges, és a projekt tartalma elveszik. A törlés után a 
 felhasználó visszatér a default projektre. A törlés a mentésből is megtörténik.
@@ -31,7 +31,8 @@ felhasználó visszatér a default projektre. A törlés a mentésből is megtö
 ## Environmentkezelés
 A Environmentkezelés (továbbiakban 'Env') célja, hogy egy változó-készletet több értéket is feltudjon venni, és a 
 felhasználó könnyen tudjon váltani a különböző értékek között. Minden env egy projekthez tartozik, és a 
-projekten belül a felhasználó létrehozhat több env-et is.
+projekten belül a felhasználó létrehozhat több env-et is. Minden projekthez tartozik egy alapértelmezett env, 
+amely a felhasználó elsődleges változó-készlete, és nem törölhető, de átnevezhető, és a színe is módosítható.
 Az env-ek közötti váltás a felhasználói felületen keresztül történik, és a kiválasztott environment lesz az 
 aktív environment. Az egyes env-ekhez meg lehet adni színeket, amelyek a felhasználói felületen megjelennek, 
 így a felhasználó könnyen tudja azonosítani az aktív environmentet.
@@ -83,4 +84,6 @@ environmentet.
 nem adhat meg egyedi színt. A színek a felhasználói felületen megjelennek, így a felhasználó könnyen tudja azonosítani 
 az aktív environmentet.
 - Menüből elérhető legyen egy "Projekt/env kezelése" menüpont, amely megnyit egy modális ablakot, ahol a felhasználó 
-láthatja az összes projektet/env-et, és ott tudja törölni, duplikálni, vagy átnevezni azokat.
+    láthatja az összes projektet/env-et, és ott tudja törölni, duplikálni, vagy átnevezni azokat, illetve 
+    environmentnél a színt változtatni. A Változtatások azonnal érvényesülnek, és a felhasználói felület frissül az 
+    új projekt/env információval. 

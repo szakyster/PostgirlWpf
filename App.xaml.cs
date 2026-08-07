@@ -4,7 +4,6 @@ using Postgirl.Domain.Persistence;
 using Postgirl.Presentation.ViewModels;
 using Postgirl.Presentation.Views;
 using Postgirl.Services;
-using System.Collections.Generic;
 using Postgirl.Services.Execution;
 using Postgirl.Services.Execution.Steps;
 using System;
@@ -15,7 +14,6 @@ namespace Postgirl
 {
     public partial class App
     {
-
         public static IHost AppHost { get; private set; } = null!;
 
         private readonly LockfileService _lockfileService = new();
@@ -53,27 +51,25 @@ namespace Postgirl
 
         protected override async void OnExit(ExitEventArgs e)
         {
-
-            var storage = AppHost.Services.GetRequiredService<StorageService>();
-            var history = AppHost.Services.GetRequiredService<HistoryService>();
-            var saved = AppHost.Services.GetRequiredService<SavedRequestService>();
-            var variables = AppHost.Services.GetRequiredService<VariablesService>();
-            var configuration = AppHost.Services.GetRequiredService<ConfigurationService>();
+            var projectService = AppHost.Services.GetRequiredService<ProjectService>();
             var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
+            var configuration = AppHost.Services.GetRequiredService<ConfigurationService>();
+            var storage = AppHost.Services.GetRequiredService<StorageService>();
 
             try
             {
-                var state = new AppState
-                {
-                    History = configuration.GetStorageKeepHistoryBetweenSessions() ? history.Export() : [],
-                    SavedRequests = saved.Export(),
-                    Variables = variables.Export(),
-                    Configuration = configuration.Export(),
-                    OpenedDocuments = mainViewModel.ExportOpenedDocuments(),
-                    ActiveSidebarPanel = mainViewModel.ActiveSidebarPanel
-                };
+                // Persist opened documents and sidebar state back into the active project
+                projectService.ActiveProject.OpenedDocuments = mainViewModel.ExportOpenedDocuments();
+                projectService.ActiveProject.ActiveSidebarPanel = mainViewModel.ActiveSidebarPanel;
+                projectService.SaveActiveProject();
 
-                storage.SaveAsync(state);
+                // Persist global configuration
+                var globalState = new Postgirl.Domain.Persistence.AppState
+                {
+                    Configuration = configuration.Export()
+                };
+                storage.SaveConfiguration(globalState);
+
                 if (AppHost != null)
                 {
                     await AppHost.StopAsync();
@@ -109,6 +105,7 @@ namespace Postgirl
             services.AddSingleton<SavedRequestService>();
             services.AddSingleton<VariablesService>();
             services.AddSingleton<StorageService>();
+            services.AddSingleton<ProjectService>();
 
             //WMs
             services.AddSingleton<MainViewModel>();
@@ -120,43 +117,30 @@ namespace Postgirl
         private async Task InitializeApplicationAsync()
         {
             var storageService = AppHost.Services.GetRequiredService<StorageService>();
-            var historyService = AppHost.Services.GetRequiredService<HistoryService>();
-            var savedService = AppHost.Services.GetRequiredService<SavedRequestService>();
-            var variablesService = AppHost.Services.GetRequiredService<VariablesService>();
             var configurationService = AppHost.Services.GetRequiredService<ConfigurationService>();
+            var projectService = AppHost.Services.GetRequiredService<ProjectService>();
 
-            var state = await storageService.LoadAsync();
+            // Load global configuration first
+            var globalState = await storageService.LoadConfigurationAsync();
+            configurationService.Import(globalState.Configuration);
 
-            configurationService.Import(state.Configuration);
+            // Migrate legacy state if needed, then load active project into services
+            await projectService.InitializeAsync();
 
-            if (configurationService.GetStorageKeepHistoryBetweenSessions())
-            {
-                historyService.Import(state.History);
-            }
-
-            savedService.Import(state.SavedRequests);
-            variablesService.Import(state.Variables);
-
-            if (variablesService.Items.Count == 0)
-            {
-                variablesService.SeedDefaults();
-            }
-
-            // mainViewModel resolved AFTER all imports so VariablesViewModel initializes from populated service
+            // MainViewModel resolved AFTER all imports so ViewModels initialize from populated services
             var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
 
-            // Import opened documents or add new empty document if none exist
-            if (state.OpenedDocuments != null && state.OpenedDocuments.Count > 0)
+            var openedDocs = projectService.ActiveProject.OpenedDocuments;
+            if (openedDocs != null && openedDocs.Count > 0)
             {
-                mainViewModel.ImportOpenedDocuments(state.OpenedDocuments);
+                mainViewModel.ImportOpenedDocuments(openedDocs);
             }
             else
             {
-                // If no saved documents, create a new empty one
                 mainViewModel.NewTabCommand.Execute(null);
             }
 
-            mainViewModel.ActiveSidebarPanel = state.ActiveSidebarPanel;
+            mainViewModel.ActiveSidebarPanel = projectService.ActiveProject.ActiveSidebarPanel;
 
             var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
             mainWindow.Show();

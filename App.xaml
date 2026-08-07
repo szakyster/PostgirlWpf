@@ -7,8 +7,10 @@
     <Application.Resources>
 	    <ResourceDictionary>
 			<converters:BodyTypeToVisibilityConverter x:Key="BodyTypeToVisibilityConverter"/>
-			<converters:StatusCodeToVisibilityConverter x:Key="StatusCodeToVisibilityConverter" />
-			<converters:StringTruncateConverter x:Key="StringTruncateConverter"/>
+				<converters:StatusCodeToVisibilityConverter x:Key="StatusCodeToVisibilityConverter" />
+				<converters:StringTruncateConverter x:Key="StringTruncateConverter"/>
+				<converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+				<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Presentation/Themes/Colors.xaml"/>
 				<ResourceDictionary Source="Presentation/Themes/Brushes.xaml"/>
