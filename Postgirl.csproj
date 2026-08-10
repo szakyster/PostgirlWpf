@@ -20,16 +20,22 @@
     <None Remove="Assets\postgirl.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".github\agents\agentic-factory.md" />
-    <None Include=".github\agents\developer.md" />
-    <None Include=".github\agents\git-expert.md" />
-    <None Include=".github\agents\faggato.md" />
-    <None Include=".github\agents\planner.md" />
-    <None Include=".github\agents\qm.md" />
-    <None Include=".github\agents\release-manager.md" />
+    <None Include=".github\agents\agentic-factory.agent.md" />
+    <None Include=".github\agents\developer.agent.md" />
+    <None Include=".github\agents\faggato.agent.md" />
+    <None Include=".github\agents\git-expert.agent.md" />
+    <None Include=".github\agents\planner.agent.md" />
+    <None Include=".github\agents\qm.agent.md" />
+    <None Include=".github\agents\release-manager.agent.md" />
     <None Include=".github\copilot-instructions.md" />
     <None Include=".github\instructions\agent-behavior.instructions.md" />
     <None Include=".github\instructions\development.instructions.md" />
+    <None Include=".github\prompts\git-hibaelemzes.prompt.md" />
+    <None Include=".github\prompts\pull-request-osszefoglalo.prompt.md" />
+    <None Include=".github\skills\github-pr-management\skill.md" />
+    <None Include=".github\skills\validated-build-commit-push\build-commit-push.ps1" />
+    <None Include=".github\skills\validated-build-commit-push\skill.md" />
+    <None Include=".github\workflows\dotnet-desktop.yml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />

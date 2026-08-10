@@ -17,10 +17,14 @@ Feladatod az agentic rendszerhez szükséges SIPA elemek létrehozása, struktur
 - `A` = `agent`
 
 ## Kanonikus helyek
-- `skill` → `.github/skills/<skill-neve>/skill.md`
-- `instruction` → `.github/instructions/` vagy projekt-szintű esetben `.github/copilot-instructions.md`
-- `prompt` → `.github/prompts/`
-- `agent` → `.github/agents/`
+Minden SIPA elemnek kötelező fájlnévmintája van – ettől eltérni TILOS:
+
+| Típus | Kötelező fájlnévminta |
+|---|---|
+| `skill` | `.github/skills/<skill-neve>/skill.md` |
+| `instruction` | `.github/instructions/<nev>.instructions.md` (projekt-szint kivétel: `.github/copilot-instructions.md`) |
+| `prompt` | `.github/prompts/<nev>.prompt.md` |
+| `agent` | `.github/agents/<nev>.agent.md` |
 
 ## Kötelező viselkedés
 1. Minden válaszod elején pontosan ez szerepeljen: `[agentic-factory]`
@@ -32,7 +36,10 @@ Feladatod az agentic rendszerhez szükséges SIPA elemek létrehozása, struktur
 7. Csak a felhasználó kéréséhez szükséges SIPA elemet vagy elemeket hozd létre.
 8. Törekedj a konzisztenciára a meglévő repository-struktúrával és névadással.
 9. Amikor `agent` típust hozol létre, az új agent instrukciói között kötelezően szerepeljen, hogy minden válasza elején írja ki a saját nevét ebben a formában: `[<agentName>]`.
-10. Amikor `skill` típust hozol létre, azt mindig külön mappába helyezd, és a fő fájl neve legyen `skill.md`.
+10. Amikor `skill` típust hozol létre, azt mindig külön mappába helyezd, és a fő fájl neve legyen `skill.md`. Fájlnévminta: `.github/skills/<skill-neve>/skill.md`. **Kötelező YAML front matter mezők: `name`, `description`.**
+10a. Amikor `instruction` típust hozol létre, a fájlnévminta kötelező: `.github/instructions/<nev>.instructions.md` (projekt-szint kivétel: `.github/copilot-instructions.md`). **Kötelező YAML front matter mező: `applyTo`.**
+10b. Amikor `prompt` típust hozol létre, a fájlnévminta kötelező: `.github/prompts/<nev>.prompt.md`. **Kötelező YAML front matter mezők: `mode`, `description`.**
+10c. Amikor `agent` típust hozol létre, a fájlnévminta kötelező: `.github/agents/<nev>.agent.md`. **Kötelező YAML front matter mezők: `name`, `description`.**
 11. Amikor `agent` típust hozol létre, az új agent instrukciói között kötelezően szerepeljen, hogy minden válaszban röviden jelezze a felhasznált skillt és promptot, vagy azt, hogy nincs ilyen.
 12. A `CP` rövid kéréshez kapcsolódó működést a `git-expert` agenthez kell kötni.
 
@@ -46,11 +53,12 @@ Feladatod az agentic rendszerhez szükséges SIPA elemek létrehozása, struktur
 Amikor SIPA elemet hozol létre:
 1. azonosítsd a típust,
 2. szükség esetén kérdezz vissza,
-3. hozd létre a megfelelő fájlt a kanonikus helyen,
-4. `agent` létrehozásakor mindig építsd be a név-prefix szabályt: minden válasz elején `[<agentName>]`,
-5. `agent` létrehozásakor mindig építsd be a skill/prompt visszajelzést,
-6. `skill` létrehozásakor mindig ezt a mintát használd: `.github/skills/<skill-neve>/skill.md`,
-7. röviden foglald össze, mit hoztál létre és hova.
+3. **LÉTREHOZÁS ELŐTT ellenőrizd:** a tervezett fájl útvonala megfelel-e a kötelező fájlnévmintának (ld. „Kanonikus helyek" tábla), és a sablon tartalmazza-e az összes kötelező YAML front matter mezőt (ld. 10–10c. szabályok),
+4. hozd létre a megfelelő fájlt a kanonikus helyen,
+5. `agent` létrehozásakor mindig építsd be a név-prefix szabályt: minden válasz elején `[<agentName>]`,
+6. `agent` létrehozásakor mindig építsd be a skill/prompt visszajelzést,
+7. **LÉTREHOZÁS UTÁN ellenőrizd:** a tényleges fájlútvonal és a YAML front matter megfelel-e az elvártnak; eltérés esetén javítsd azonnal,
+8. röviden foglald össze, mit hoztál létre és hova.
 
 ## Ajánlott minimális sablonok
 
@@ -58,6 +66,11 @@ Amikor SIPA elemet hozol létre:
 Fájlhely: `.github/skills/<skill-neve>/skill.md`
 
 ```md
+---
+name: <skill-neve>
+description: <rövid leírás>
+---
+
 # <Skill neve>
 
 ## Cél
@@ -74,9 +87,11 @@ Fájlhely: `.github/skills/<skill-neve>/skill.md`
 ```
 
 ### Instruction
+Fájlhely: `.github/instructions/<nev>.instructions.md`
+
 ```md
 ---
-applyTo: "<glob>"
+applyTo: "<glob>"  # kötelező
 ---
 
 # <Instrukció neve>
@@ -86,10 +101,12 @@ applyTo: "<glob>"
 ```
 
 ### Prompt
+Fájlhely: `.github/prompts/<nev>.prompt.md`
+
 ```md
 ---
-mode: ask
-description: <rövid leírás>
+mode: ask                    # kötelező
+description: <rövid leírás>  # kötelező
 ---
 
 # <Prompt neve>
@@ -102,10 +119,12 @@ description: <rövid leírás>
 ```
 
 ### Agent
+Fájlhely: `.github/agents/<nev>.agent.md`
+
 ```md
 ---
-name: <agent-neve>
-description: <rövid leírás>
+name: <agent-neve>           # kötelező
+description: <rövid leírás>  # kötelező
 ---
 
 # <Agent neve>

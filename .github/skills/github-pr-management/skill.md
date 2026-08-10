@@ -1,3 +1,8 @@
+---
+name: GitHub PR Management
+description: PR létrehozás, karbantartás, review előkészítés és merge döntések strukturált támogatása GitHub pull requestekhez.
+---
+
 # GitHub PR Management
 
 ## Cél
